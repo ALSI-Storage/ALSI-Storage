@@ -1331,12 +1331,27 @@ function apply(anim) {
   stage.style.transform = `translate(${V.x}px,${V.y}px) scale(${V.k})`;
   if (!raf) raf = requestAnimationFrame(() => { raf = 0; track(); });
 }
-function zoomAt(cx, cy, nk) { nk = clampK(nk); V.x = cx - (cx - V.x) * nk / V.k; V.y = cy - (cy - V.y) * nk / V.k; V.k = nk; apply(); }
+function zoomAt(cx, cy, nk) { zt = null; nk = clampK(nk); V.x = cx - (cx - V.x) * nk / V.k; V.y = cy - (cy - V.y) * nk / V.k; V.k = nk; apply(); }  // instant: used by pinch, which already follows the fingers
+/* smooth zoom (wheel, + -, keys): the wheel only moves a target scale; every frame the view eases toward it (scale geometrically, so in and out feel equal)
+   while the point under the cursor stays put, like the Obsidian canvas / Miro */
+let zt = null, zraf = 0;
+function zoomTo(cx, cy, nk) {
+  zt = { k: clampK(nk), cx, cy, wx: (cx - V.x) / V.k, wy: (cy - V.y) / V.k, last: 0 };
+  if (!zraf) zraf = requestAnimationFrame(zstep);
+}
+function zstep(now) {
+  zraf = 0; if (!zt) return;
+  const dt = Math.min(50, now - (zt.last || now - 16)); zt.last = now;
+  V.k = Math.abs(Math.log(zt.k / V.k)) < .001 ? zt.k : V.k * Math.pow(zt.k / V.k, 1 - Math.exp(-dt / 75));
+  V.x = zt.cx - zt.wx * V.k; V.y = zt.cy - zt.wy * V.k;
+  apply();
+  if (V.k === zt.k) zt = null; else zraf = requestAnimationFrame(zstep);
+}
 const topH = () => $("#top").offsetHeight, botH = () => 100;
 function focusRect(x, y, w, h, o = {}) {
   const { minK = .2, maxK = 1.25, pad = 36 } = o, vw = innerWidth, vh = innerHeight - topH() - botH();
   const k = Math.max(minK, Math.min(maxK, vw / (w + pad * 2), vh / (h + pad * 2)));
-  V.k = k; V.x = vw / 2 - (x + w / 2) * k; V.y = topH() + 14 + (vh - 14) / 2 - (y + h / 2) * k; apply(true);
+  zt = null; V.k = k; V.x = vw / 2 - (x + w / 2) * k; V.y = topH() + 14 + (vh - 14) / 2 - (y + h / 2) * k; apply(true);
 }
 // Polish plural: 1 karta, 2-4 karty, 5+ kart (but 12-14 and 0 take the "many" form)
 const pl = (n, one, few, many) => n === 1 ? one : (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14)) ? few : many;
@@ -1387,7 +1402,7 @@ function track() {
 const ptr = new Map(); let moved = 0;
 view.addEventListener("pointerdown", e => {
   if (isList() || e.target.closest("a,button,.ref")) return;
-  view.setPointerCapture(e.pointerId); ptr.set(e.pointerId, [e.clientX, e.clientY]); moved = 0;
+  zt = null; view.setPointerCapture(e.pointerId); ptr.set(e.pointerId, [e.clientX, e.clientY]); moved = 0;
   stage.classList.remove("anim"); view.classList.add("drag");
 });
 view.addEventListener("pointermove", e => {
@@ -1408,15 +1423,17 @@ view.addEventListener("pointerup", up); view.addEventListener("pointercancel", u
 view.addEventListener("scroll", () => { view.scrollLeft = 0; view.scrollTop = 0; });  // fallback for browsers without overflow:clip
 view.addEventListener("wheel", e => {
   if (isList()) return; e.preventDefault(); stage.classList.remove("anim");
-  if (e.ctrlKey) zoomAt(e.clientX, e.clientY, V.k * Math.exp(-e.deltaY * .01));
-  else { V.x -= e.deltaX; V.y -= e.deltaY; apply(); }
+  // a mouse wheel notch (big, whole, horizontal-free steps) zooms like in Obsidian; two-finger trackpad scroll pans; pinch (ctrlKey) zooms
+  const notch = e.deltaMode === 1 || (Math.abs(e.deltaY) >= 100 && e.deltaX === 0 && e.deltaY % 1 === 0);
+  if (e.ctrlKey || notch) zoomTo(e.clientX, e.clientY, (zt ? zt.k : V.k) * Math.exp(-e.deltaY * (notch ? (e.deltaMode === 1 ? .066 : .002) : .01)));
+  else { zt = null; V.x -= e.deltaX; V.y -= e.deltaY; apply(); }
 }, { passive: false });
 addEventListener("keydown", e => {
   if (isList() || e.target.closest("input,textarea")) return;
   const m = { ArrowLeft: [80, 0], ArrowRight: [-80, 0], ArrowUp: [0, 80], ArrowDown: [0, -80] }[e.key];
-  if (m) { e.preventDefault(); stage.classList.remove("anim"); V.x += m[0]; V.y += m[1]; apply(); }
-  else if (e.key === "+" || e.key === "=") zoomAt(innerWidth / 2, innerHeight / 2, V.k * 1.25);
-  else if (e.key === "-") zoomAt(innerWidth / 2, innerHeight / 2, V.k / 1.25);
+  if (m) { e.preventDefault(); zt = null; stage.classList.remove("anim"); V.x += m[0]; V.y += m[1]; apply(); }
+  else if (e.key === "+" || e.key === "=") zoomTo(innerWidth / 2, innerHeight / 2, (zt ? zt.k : V.k) * 1.25);
+  else if (e.key === "-") zoomTo(innerWidth / 2, innerHeight / 2, (zt ? zt.k : V.k) / 1.25);
   else if (e.key === "0") openMap();
   else if (e.key === "]") goZone(curZone + 1); else if (e.key === "[") goZone(curZone - 1);
   else if (e.key === "Escape") { closeMap(); select(null); }
@@ -1448,7 +1465,7 @@ document.addEventListener("click", e => {
 });
 $("#prev").onclick = () => goZone(curZone - 1); $("#next").onclick = () => goZone(curZone + 1);
 $("#zlabel").onclick = openMap;
-$("#zi").onclick = () => zoomAt(innerWidth / 2, innerHeight / 2, V.k * 1.3); $("#zo").onclick = () => zoomAt(innerWidth / 2, innerHeight / 2, V.k / 1.3);
+$("#zi").onclick = () => zoomTo(innerWidth / 2, innerHeight / 2, (zt ? zt.k : V.k) * 1.3); $("#zo").onclick = () => zoomTo(innerWidth / 2, innerHeight / 2, (zt ? zt.k : V.k) / 1.3);
 $("#fit").onclick = openMap; $("#mpx").onclick = closeMap;
 addEventListener("popstate", () => { const h = location.hash.slice(1); if (h) go(h, true); else select(null); });
 
