@@ -164,6 +164,9 @@ path.l.on { stroke:var(--cy); stroke-width:3; }
 
 /* controls legend: bottom-left, only where a wheel exists and there is room beside the centered bottom bar */
 #legend { position:fixed; z-index:5; left:14px; bottom:calc(env(safe-area-inset-bottom) + 14px); padding:8px 12px; background:rgba(15,15,16,.88); border:1px solid #2a2a2c; border-radius:14px; font-size:11px; line-height:1.9; color:var(--mu); pointer-events:none; }
+#sw { display:inline-flex; padding:2px; margin-bottom:6px; background:#0b0b0c; border:1px solid #3a3a3d; border-radius:999px; pointer-events:auto; }
+#sw button { font:inherit; font-weight:700; width:28px; height:22px; border:0; border-radius:999px; background:transparent; color:var(--mu); cursor:pointer; padding:0; }
+#sw button:hover { color:var(--tx); } #sw button.on { background:var(--cy-d); color:var(--cy); }
 #legend kbd { font:inherit; color:var(--soft); border:1px solid #3a3a3d; border-radius:6px; padding:0 5px; margin-right:2px; }
 #legend span { margin-left:6px; }
 body.list #legend { display:none; }
@@ -1232,10 +1235,8 @@ html.js-ok body.list { overflow:auto; height:auto; }
 </div>
 <nav id="bottom" aria-label="Sekcje"></nav>
 <aside id="legend" aria-label="Sterowanie tablicą">
-  <div><kbd>Kółko</kbd><span>góra / dół</span></div>
-  <div><kbd>Shift</kbd>+<kbd>kółko</kbd><span>lewo / prawo</span></div>
-  <div><kbd>Ctrl</kbd>+<kbd>kółko</kbd><span>zoom</span></div>
-  <div><kbd>Przeciągnij</kbd><span>przesuń</span></div>
+  <div id="sw" role="group" aria-label="Schemat sterowania"><button type="button" data-s="1">1</button><button type="button" data-s="2">2</button><button type="button" data-s="3">3</button></div>
+  <div id="lg"></div>
 </aside>
 <div id="map" role="dialog" aria-label="Mapa spotkania"><div class="mp-top"><h2>Mapa</h2><button class="rb" id="mpx" type="button" aria-label="Zamknij mapę">×</button></div><div class="mp-grid" id="mpg"></div></div>
 
@@ -1444,14 +1445,33 @@ view.addEventListener("pointerup", up); view.addEventListener("pointercancel", u
 view.addEventListener("scroll", () => { view.scrollLeft = 0; view.scrollTop = 0; });  // fallback for browsers without overflow:clip
 view.addEventListener("wheel", e => {
   if (isList()) return; e.preventDefault(); stage.classList.remove("anim");
-  // wheel = up/down, shift+wheel = left/right, ctrl+wheel (and trackpad pinch, which browsers send as ctrl+wheel) = zoom around the cursor.
+  // What the wheel does depends on the modifier and on the chosen scheme (the 1 2 3 switch above the legend): zoom around the cursor, pan up/down, pan left/right.
   // Zoom is proportional to the delta, whatever size the browser reports (DPI scaling and smooth-wheel mice give 66, 80, 120, 12 ...).
-  const u = e.deltaMode === 1 ? 40 : e.deltaMode === 2 ? 400 : 1; let dx = e.deltaX * u, dy = e.deltaY * u;
-  if (e.ctrlKey) { zoomTo(e.clientX, e.clientY, (zt ? zt.k : V.k) * Math.exp(-Math.max(-300, Math.min(300, dy)) * (Math.abs(dy) < 50 ? .01 : .002))); return; }
-  if (e.shiftKey && !dx) { dx = dy; dy = 0; }  // Chrome already swaps these; Firefox may not
+  const u = e.deltaMode === 1 ? 40 : e.deltaMode === 2 ? 400 : 1, dx = e.deltaX * u, dy = e.deltaY * u, S = SCHEMES[scheme];
+  const act = e.ctrlKey ? S.ctrl : e.shiftKey ? S.shift : S.plain, mod = e.ctrlKey || e.shiftKey;
+  if (act === "zoom") { zoomTo(e.clientX, e.clientY, (zt ? zt.k : V.k) * Math.exp(-Math.max(-300, Math.min(300, dy)) * (e.ctrlKey && scheme === 1 && Math.abs(dy) < 50 ? .01 : .002))); return; }  // small ctrl steps in scheme 1 = trackpad pinch
+  const m = dy || dx;  // Chrome sends shift+wheel as deltaX, other browsers as deltaY
+  const px = act === "panx" ? m : mod ? 0 : dx, py = act === "panx" ? 0 : mod ? m : dy;
   // big steps (mouse notch) ease toward the target; small ones (trackpad stream, smooth wheels) are already smooth and apply at once
-  if (Math.abs(dx) + Math.abs(dy) >= 50 || e.deltaMode) panBy(-dx, -dy); else panNow(-dx, -dy);
+  if (Math.abs(px) + Math.abs(py) >= 50 || e.deltaMode) panBy(-px, -py); else panNow(-px, -py);
 }, { passive: false });
+/* control schemes: plain / ctrl / shift + wheel */
+const SCHEMES = { 1: { plain: "pan", ctrl: "zoom", shift: "panx" }, 2: { plain: "zoom", ctrl: "pan", shift: "panx" }, 3: { plain: "zoom", ctrl: "panx", shift: "pan" } };
+const LEGEND = {
+  1: [[["Kółko"], "góra / dół"], [["Shift", "kółko"], "lewo / prawo"], [["Ctrl", "kółko"], "zoom"]],
+  2: [[["Kółko"], "zoom"], [["Ctrl", "kółko"], "góra / dół"], [["Shift", "kółko"], "lewo / prawo"]],
+  3: [[["Kółko"], "zoom"], [["Shift", "kółko"], "góra / dół"], [["Ctrl", "kółko"], "lewo / prawo"]]
+};
+let scheme = 1;
+try { scheme = Math.min(3, Math.max(1, +localStorage.getItem("alsi-controls") || 1)); } catch (e) {}
+function setScheme(n, save) {
+  scheme = n;
+  $("#lg").innerHTML = LEGEND[n].concat([[["Przeciągnij"], "przesuń"]]).map(([k, t]) => `<div>${k.map(x => `<kbd>${x}</kbd>`).join("+")}<span>${t}</span></div>`).join("");
+  document.querySelectorAll("#sw button").forEach(b => { const on = +b.dataset.s === n; b.classList.toggle("on", on); b.setAttribute("aria-pressed", on); });
+  if (save) try { localStorage.setItem("alsi-controls", n); } catch (e) {}
+}
+document.querySelectorAll("#sw button").forEach(b => b.onclick = () => setScheme(+b.dataset.s, true));
+setScheme(scheme);
 /* list mode: the same easing for wheel scrolling (a native notch jumps ~100 px at once). Sideways swipes, pinch and keys stay native. */
 const scroller = () => document.scrollingElement || document.documentElement;
 let slast = 0, sraf = 0, sf = 0;
