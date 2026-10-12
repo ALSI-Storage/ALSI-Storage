@@ -5,6 +5,7 @@
 <meta name="robots" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Spotkanie 1: Komunikacja międzyludzka i początki informatyki</title>
+<script>try { document.documentElement.dataset.theme = localStorage.getItem('alsi-theme') || 'dark'; } catch (e) { document.documentElement.dataset.theme = 'dark'; }</script>
 <style>
 @font-face {
   font-family: 'IBM Plex Mono';
@@ -40,12 +41,24 @@
 }
 
 :root {
-  --bg:#000; --s1:#0f0f10; --s2:#171718; --bd:#262628; --tx:#f4f4f4; --mu:#8d8d92; --soft:#d9d9dc;
+  --bg:#000; --s1:#0f0f10; --s2:#171718; --bd:#262628; --tx:#f4f4f4; --mu:#8d8d92; --soft:#d9d9dc; --ink:#fff;
   --cy:#45d0de; --cy-d:#123a40; --cy-l:#1f4a50;
   --or:#ff7a1a; --fu:#ff4fc0; --gr:#6a6a70;
+  --chip-bg:#0b0b0c; --chip-bd:#3a3a3d; --dot:#1c1c1f; --zone-bd:#212124; --zone-bg:rgba(5,5,6,.82);
+  --o-bg:#150d06; --o-bd:#5a3112; --f-bg:#14080f; --f-bd:#561a41; --link:#2b8f9a; --pill-bg:#000;
+  --nav-bg:#0f0f10; --nav-bd:#2a2a2c; --leg-bg:rgba(15,15,16,.88); --peek-sh:rgba(0,0,0,.75); --sel-glow:rgba(69,208,222,.28);
+  --fl-cy:rgba(69,208,222,.16); --fl-or:rgba(255,122,26,.16); --fl-fu:rgba(255,79,192,.16); --fl-sh:rgba(217,217,220,.1);
   --mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
 }
+:root[data-theme=light] {  /* same paper and inks as the library pages (shared.css), accents darkened for contrast */
+  --bg:#e9ecf0; --s1:#f6f7f9; --s2:#eceff3; --bd:#cfd4db; --tx:#1c2028; --mu:#586170; --soft:#343b47; --ink:#0c0f14;
+  --cy:#07798c; --cy-d:#cfe7ec; --cy-l:#9fc9d2; --or:#b8530a; --fu:#a8256f; --gr:#8a929d;
+  --chip-bg:#f6f7f9; --chip-bd:#c4cad3; --dot:#cdd3db; --zone-bd:#cfd4db; --zone-bg:rgba(246,247,249,.8);
+  --o-bg:#fbefe3; --o-bd:#e6c3a0; --f-bg:#fbe9f3; --f-bd:#e3b6d0; --link:#5fa7b2; --pill-bg:#f6f7f9;
+  --nav-bg:#f6f7f9; --nav-bd:#cfd4db; --leg-bg:rgba(246,247,249,.92); --peek-sh:rgba(40,55,80,.25); --sel-glow:rgba(7,121,140,.25);
+  --fl-cy:rgba(7,121,140,.16); --fl-or:rgba(184,83,10,.16); --fl-fu:rgba(168,37,111,.16); --fl-sh:rgba(52,59,71,.1); }
 * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html[data-theme=light] { color-scheme:light; }
 html { color-scheme:dark; -webkit-text-size-adjust:100%; text-size-adjust:100%; }
 /* Until the script has built the board (html.js-ok) the page shows #fallback: the whole lesson as plain HTML.
    If the script cannot run (chat-app preview, Quick Look, old browser) that is what the reader sees. */
@@ -53,34 +66,34 @@ html:not(.js-ok) #top, html:not(.js-ok) #view, html:not(.js-ok) #ctrl, html:not(
 html.js-ok #fallback { display:none; }
 #fallback { max-width:46rem; margin:0 auto; padding:18px 16px 60px; }
 #fallback h1 { font-size:26px; line-height:1.2; margin:0 0 6px; }
-#fallback h2 { font-size:21px; margin:34px 0 10px; padding-top:6px; border-top:1px solid #262628; }
-#fallback h2 small { color:#8d8d92; font-size:12px; font-weight:400; margin-left:8px; }
+#fallback h2 { font-size:21px; margin:34px 0 10px; padding-top:6px; border-top:1px solid var(--bd); }
+#fallback h2 small { color:var(--mu); font-size:12px; font-weight:400; margin-left:8px; }
 #fallback h3 { font-size:16px; line-height:1.35; margin:0 0 4px; }
-#fallback .fb-note { background:#12343a; color:#8ef0fa; border-radius:12px; padding:10px 12px; font-size:13px; }
+#fallback .fb-note { background:var(--cy-d); color:var(--cy); border-radius:12px; padding:10px 12px; font-size:13px; }
 #fallback .fb-nav { font-size:13px; line-height:2; margin:12px 0; }
 #fallback .fb-nav a { margin-right:12px; white-space:nowrap; }
-#fallback article { background:#0f0f10; border:1px solid #262628; border-left:5px solid #45d0de; border-radius:14px; padding:10px 12px; margin:10px 0; }
-#fallback article.fb-o { border-color:#5a3112; border-left-color:#ff7a1a; background:#150d06; }
-#fallback article.fb-f { border-color:#561a41; border-left-color:#ff4fc0; background:#14080f; }
-#fallback .fb-m { font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:#8d8d92; margin:0 0 4px; }
-#fallback .fb-b { font-size:14px; color:#d9d9dc; margin:4px 0; }
-#fallback .fb-eq { margin:6px 0; overflow-x:auto; color:#fff; } #fallback .fig svg { max-width:100%; height:auto; }
-#fallback .fb-r { font-size:12.5px; color:#8d8d92; margin:6px 0 0; }
-#fallback a { color:#45d0de; }
-#fallback details { margin-top:6px; } #fallback summary { cursor:pointer; color:#45d0de; }
+#fallback article { background:var(--s1); border:1px solid var(--bd); border-left:5px solid var(--cy); border-radius:14px; padding:10px 12px; margin:10px 0; }
+#fallback article.fb-o { border-color:var(--o-bd); border-left-color:var(--or); background:var(--o-bg); }
+#fallback article.fb-f { border-color:var(--f-bd); border-left-color:var(--fu); background:var(--f-bg); }
+#fallback .fb-m { font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--mu); margin:0 0 4px; }
+#fallback .fb-b { font-size:14px; color:var(--soft); margin:4px 0; }
+#fallback .fb-eq { margin:6px 0; overflow-x:auto; color:var(--ink); } #fallback .fig svg { max-width:100%; height:auto; }
+#fallback .fb-r { font-size:12.5px; color:var(--mu); margin:6px 0 0; }
+#fallback a { color:var(--cy); }
+#fallback details { margin-top:6px; } #fallback summary { cursor:pointer; color:var(--cy); }
 body { margin:0; background:var(--bg); color:var(--tx); font:15px/1.5 var(--mono); }
 html.js-ok body { overflow:hidden; height:100vh; height:100dvh; }
 button { font:inherit; color:inherit; }
 
 /* header, like the "Historia" screen: big title, round outlined buttons, centered stepper */
 #top { position:fixed; z-index:6; top:0; left:0; right:0; padding:calc(env(safe-area-inset-top) + 14px) 16px 22px;
-  background:linear-gradient(#000 62%, rgba(0,0,0,0)); pointer-events:none; }
+  background:linear-gradient(var(--bg) 62%, transparent); pointer-events:none; }
 #top > * { pointer-events:auto; }
 #top .row { display:flex; align-items:center; justify-content:space-between; gap:12px; }
 .acts { display:flex; align-items:center; gap:10px; flex:none; } a.rb { color:inherit; text-decoration:none; }
 #top h1 { margin:0; font-size:clamp(22px,2.6vw,30px); line-height:1.15; font-weight:700; letter-spacing:-.02em; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
 #sub { color:var(--mu); font-size:12px; margin:2px 0 0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.rb { width:52px; height:52px; flex:none; display:grid; place-items:center; border-radius:50%; border:1.5px solid #3a3a3d; background:#0b0b0c; cursor:pointer; font-size:22px; line-height:1; padding:0; }
+.rb { width:52px; height:52px; flex:none; display:grid; place-items:center; border-radius:50%; border:1.5px solid var(--chip-bd); background:var(--chip-bg); cursor:pointer; font-size:22px; line-height:1; padding:0; }
 .rb:hover { border-color:var(--cy); }
 .rb svg { width:26px; height:26px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
 .step { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:12px; }
@@ -90,12 +103,12 @@ button { font:inherit; color:inherit; }
 @media (max-width:600px) { .rb { width:40px; height:40px; } .rb svg { width:21px; height:21px; } .acts { gap:5px; } #top h1 { font-size:14px; overflow-wrap:anywhere; } #sub { white-space:normal; } }
 /* canvas */
 #view { position:fixed; top:0; right:0; bottom:0; left:0; overflow:hidden; overflow:clip; touch-action:none; cursor:grab;  /* clip: focus/scrollIntoView must never scroll the canvas */
-  background-image:radial-gradient(#1c1c1f 1.2px, transparent 1.3px); background-size:32px 32px; }
+  background-image:radial-gradient(var(--dot) 1.2px, transparent 1.3px); background-size:32px 32px; }
 #view.drag { cursor:grabbing; }
 #stage { position:absolute; left:0; top:0; width:0; height:0; transform-origin:0 0; }  /* will-change is set from script only while moving: a permanent one keeps the layer rastered at zoom 1, so every zoom-in looks blurry */
 #stage.anim { transition:transform .55s cubic-bezier(.2,.8,.2,1); }
-.zone { position:absolute; width:max-content; border:1.5px solid #212124; border-radius:38px; padding:28px 28px 32px; }
-.zone::before { content:""; position:absolute; top:0; right:0; bottom:0; left:0; border-radius:inherit; background:rgba(5,5,6,.82); z-index:0; }  /* layers: zone bg 0 < links 1 < labels 2 < cards 3 */
+.zone { position:absolute; width:max-content; border:1.5px solid var(--zone-bd); border-radius:38px; padding:28px 28px 32px; }
+.zone::before { content:""; position:absolute; top:0; right:0; bottom:0; left:0; border-radius:inherit; background:var(--zone-bg); z-index:0; }  /* layers: zone bg 0 < links 1 < labels 2 < cards 3 */
 .zh { position:relative; z-index:3; display:flex; justify-content:space-between; align-items:baseline; gap:24px; margin:0 6px 22px; }
 .zt { font-size:36px; font-weight:700; letter-spacing:-.02em; line-height:1.1; }
 .zs { color:var(--mu); font-size:15px; white-space:nowrap; }
@@ -104,75 +117,75 @@ button { font:inherit; color:inherit; }
 /* cards, like the transaction rows: colored bar, title, right-aligned time */
 .card { min-width:0; overflow-wrap:break-word; position:relative; z-index:3; background:var(--s1); border:1px solid var(--bd); border-radius:22px; padding:16px 18px 13px 28px; user-select:none; -webkit-user-select:none; }
 .bar { position:absolute; left:11px; top:16px; bottom:16px; width:7px; border-radius:6px; background:var(--cy); }
-.k-o { background:#150d06; border-color:#5a3112; } .k-o .bar { background:var(--or); }
-.k-f { background:#14080f; border-color:#561a41; } .k-f .bar { background:var(--fu); }
-.k-g { border-style:dashed; border-color:#3a3a3d; } .k-g .bar { background:transparent; border:2px solid var(--gr); }
+.k-o { background:var(--o-bg); border-color:var(--o-bd); } .k-o .bar { background:var(--or); }
+.k-f { background:var(--f-bg); border-color:var(--f-bd); } .k-f .bar { background:var(--fu); }
+.k-g { border-style:dashed; border-color:var(--chip-bd); } .k-g .bar { background:transparent; border:2px solid var(--gr); }
 .ty { font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--mu); margin-bottom:5px; }
 .k-o .ty { color:var(--or); } .k-f .ty { color:var(--fu); }
 .ti { margin:0; font-size:17px; line-height:1.32; font-weight:700; letter-spacing:-.01em; }
 .n { font-size:46px; line-height:1; font-weight:700; color:var(--cy); margin:2px 0 6px; letter-spacing:-.03em; }
 .k-o .n { color:var(--or); } .k-f .n { color:var(--fu); }
 .bd { font-size:14.5px; line-height:1.55; color:var(--soft); margin-top:6px; }
-.bd b { color:#fff; }
-.ft { display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin-top:11px; }
-.zn { display:inline-grid; place-items:center; min-width:1.45em; height:1.45em; padding:0 .3em; margin-right:.5em; border:1.5px solid #3a3a3d; border-radius:999px; font-style:normal; font-size:.5em; font-weight:700; color:var(--mu); vertical-align:.3em; }
+.bd b { color:var(--ink); }
+.ft { display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin-top:11px; } .ft:empty { display:none; }  /* card timestamps (c.t) are data for the completeness check, not shown */
+.zn { display:inline-grid; place-items:center; min-width:1.45em; height:1.45em; padding:0 .3em; margin-right:.5em; border:1.5px solid var(--chip-bd); border-radius:999px; font-style:normal; font-size:.5em; font-weight:700; color:var(--mu); vertical-align:.3em; }
 #zlabel small { color:var(--mu); font-size:12px; font-weight:400; margin-left:.4em; }
 
 .tm { margin-left:auto; font-size:12px; color:var(--mu); text-align:right; padding-left:8px; overflow-wrap:anywhere; }
 .ref { color:var(--cy); border-bottom:1px dotted var(--cy); cursor:pointer; text-decoration:none; }
 .ref:hover { background:var(--cy-d); border-bottom-style:solid; }
-#peek { position:fixed; z-index:9; display:none; width:300px; max-width:calc(100vw - 24px); padding:12px 14px; background:#0b0b0c; border:1px solid var(--cy-l); border-radius:16px; box-shadow:0 14px 34px rgba(0,0,0,.75); pointer-events:none; font-size:13px; line-height:1.45; }
+#peek { position:fixed; z-index:9; display:none; width:300px; max-width:calc(100vw - 24px); padding:12px 14px; background:var(--chip-bg); border:1px solid var(--cy-l); border-radius:16px; box-shadow:0 14px 34px var(--peek-sh); pointer-events:none; font-size:13px; line-height:1.45; }
 #peek .pk-ty { font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--cy); margin-bottom:4px; }
 #peek .pk-ti { font-weight:700; font-size:14px; margin-bottom:4px; }
 #peek .pk-bd { color:var(--soft); }
 .rev { margin-top:10px; font-size:13px; font-weight:700; color:var(--cy); background:transparent; border:1.5px solid var(--cy-l); border-radius:12px; padding:5px 14px; cursor:pointer; }
-.ans { display:none; margin-top:10px; padding-top:10px; border-top:1px solid var(--bd); color:#fff; }
+.ans { display:none; margin-top:10px; padding-top:10px; border-top:1px solid var(--bd); color:var(--ink); }
 .open .ans { display:block; }
-.card.sel { box-shadow:0 0 0 2px var(--cy), 0 0 34px rgba(69,208,222,.28); }
+.card.sel { box-shadow:0 0 0 2px var(--cy), 0 0 34px var(--sel-glow); }
 .card.rel { border-color:var(--cy-l); }
 
 /* equations (KaTeX, pre-rendered at build) and figures (inline SVG written with the lesson) */
-.eq { margin-top:8px; color:#fff; overflow-x:auto; overflow-y:hidden; }
+.eq { margin-top:8px; color:var(--ink); overflow-x:auto; overflow-y:hidden; }
 .eq .katex-display { margin:.3em 0; }
 .katex { font-size:1.12em; }
 .fig { margin-top:10px; color:var(--soft); }
 .fig svg { display:block; width:100%; height:auto; }
 .fig text { fill:currentColor; font:14px/1 var(--mono); }
-.fig .ax, .fig .sh, .fig .cy, .fig .or, .fig .fu { fill:none; stroke:#8d8d92; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; }  /* ax = axes and helper lines, sh = outline of a body */
+.fig .ax, .fig .sh, .fig .cy, .fig .or, .fig .fu { fill:none; stroke:var(--mu); stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; }  /* ax = axes and helper lines, sh = outline of a body */
 .fig .sh { stroke:var(--soft); stroke-width:2; }
 .fig .cy { stroke:var(--cy); stroke-width:2.4; } .fig .or { stroke:var(--or); stroke-width:2.4; } .fig .fu { stroke:var(--fu); stroke-width:2.4; }  /* cyan = drawn on the board, fuchsia = added by me */
-.fig .fl { stroke:none; } .fig .fl.cy { fill:rgba(69,208,222,.16); } .fig .fl.or { fill:rgba(255,122,26,.16); } .fig .fl.fu { fill:rgba(255,79,192,.16); } .fig .fl.sh { fill:rgba(217,217,220,.1); }
+.fig .fl { stroke:none; } .fig .fl.cy { fill:var(--fl-cy); } .fig .fl.or { fill:var(--fl-or); } .fig .fl.fu { fill:var(--fl-fu); } .fig .fl.sh { fill:var(--fl-sh); }
 .fig .da { stroke-dasharray:6 5; }
 .fig .ar.cy { marker-end:url(#a-c); } .fig .ar.or { marker-end:url(#a-o); } .fig .ar.fu { marker-end:url(#a-f); } .fig .ar.sh, .fig .ar.ax { marker-end:url(#a-w); }
 .fig .tc { fill:var(--cy); } .fig .to { fill:var(--or); } .fig .tf { fill:var(--fu); }
 
 /* connectors */
 #links { position:absolute; left:0; top:0; overflow:visible; pointer-events:none; z-index:1; }
-path.l { fill:none; stroke:#2b8f9a; stroke-width:2; marker-end:url(#ah); }
+path.l { fill:none; stroke:var(--link); stroke-width:2; marker-end:url(#ah); }
 path.l.on { stroke:var(--cy); stroke-width:3; }
 .has-sel path.l:not(.on), .has-sel .pill:not(.on) { opacity:.22; }
-.pill { z-index:2; position:absolute; transform:translate(-50%,-50%); background:#000; border:1px solid var(--cy-l); color:var(--cy); font-size:12px; padding:1px 9px; border-radius:999px; white-space:nowrap; pointer-events:none; }
+.pill { z-index:2; position:absolute; transform:translate(-50%,-50%); background:var(--pill-bg); border:1px solid var(--cy-l); color:var(--cy); font-size:12px; padding:1px 9px; border-radius:999px; white-space:nowrap; pointer-events:none; }
 
 /* controls */
 #ctrl { position:fixed; z-index:6; right:14px; bottom:calc(env(safe-area-inset-bottom) + 98px); display:flex; flex-direction:column; gap:8px; }
 #ctrl .rb { width:40px; height:40px; }
 #bottom { position:fixed; z-index:6; left:12px; right:12px; bottom:calc(env(safe-area-inset-bottom) + 12px); max-width:640px; margin:0 auto; display:flex; gap:4px; padding:6px;
-  background:#0f0f10; border:1px solid #2a2a2c; border-radius:30px; }
+  background:var(--nav-bg); border:1px solid var(--nav-bd); border-radius:30px; }
 .ni { flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; padding:9px 4px 7px; border:0; background:transparent; color:var(--mu); border-radius:24px; cursor:pointer; font-size:12px; }
 .ni svg { width:23px; height:23px; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
 .ni.on { background:var(--cy-d); color:var(--cy); }
 
 /* controls legend: bottom-left, only where a wheel exists and there is room beside the centered bottom bar */
-#legend { position:fixed; z-index:5; left:14px; bottom:calc(env(safe-area-inset-bottom) + 14px); padding:8px 12px; background:rgba(15,15,16,.88); border:1px solid #2a2a2c; border-radius:14px; font-size:11px; line-height:1.9; color:var(--mu); pointer-events:none; }
-#sw { display:inline-flex; padding:2px; margin-bottom:6px; background:#0b0b0c; border:1px solid #3a3a3d; border-radius:999px; pointer-events:auto; }
+#legend { position:fixed; z-index:5; left:14px; bottom:calc(env(safe-area-inset-bottom) + 14px); padding:8px 12px; background:var(--leg-bg); border:1px solid var(--nav-bd); border-radius:14px; font-size:11px; line-height:1.9; color:var(--mu); pointer-events:none; }
+#sw { display:inline-flex; padding:2px; margin-bottom:6px; background:var(--chip-bg); border:1px solid var(--chip-bd); border-radius:999px; pointer-events:auto; }
 #sw button { font:inherit; font-weight:700; width:28px; height:22px; border:0; border-radius:999px; background:transparent; color:var(--mu); cursor:pointer; padding:0; }
 #sw button:hover { color:var(--tx); } #sw button.on { background:var(--cy-d); color:var(--cy); }
-#legend kbd { font:inherit; color:var(--soft); border:1px solid #3a3a3d; border-radius:6px; padding:0 5px; margin-right:2px; }
+#legend kbd { font:inherit; color:var(--soft); border:1px solid var(--chip-bd); border-radius:6px; padding:0 5px; margin-right:2px; }
 #legend span { margin-left:6px; }
 body.list #legend { display:none; }
 @media (max-width:1000px), (hover:none) { #legend { display:none; } }
 /* map: zones as tiles in their board positions, a readable overview for big lessons */
-#map { position:fixed; top:0; right:0; bottom:0; left:0; z-index:8; display:none; background:#000; overflow:auto; padding:calc(env(safe-area-inset-top) + 18px) 16px 120px; }
+#map { position:fixed; top:0; right:0; bottom:0; left:0; z-index:8; display:none; background:var(--bg); overflow:auto; padding:calc(env(safe-area-inset-top) + 18px) 16px 120px; }
 #map.on { display:block; }
 .mp-top { display:flex; align-items:center; justify-content:space-between; gap:12px; margin:0 auto 18px; max-width:1100px; }
 .mp-top h2 { margin:0; font-size:26px; letter-spacing:-.02em; }
@@ -201,10 +214,10 @@ html.js-ok body.list { overflow:auto; height:auto; }
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>  <!-- arrowheads for figures; here, not inside #links/#fallback, so list mode and the no-script view see them too -->
-  <marker id="a-c" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" fill="#45d0de"/></marker>
-  <marker id="a-o" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" fill="#ff7a1a"/></marker>
-  <marker id="a-f" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" fill="#ff4fc0"/></marker>
-  <marker id="a-w" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" fill="#d9d9dc"/></marker>
+  <marker id="a-c" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" style="fill:var(--cy)"/></marker>
+  <marker id="a-o" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" style="fill:var(--or)"/></marker>
+  <marker id="a-f" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" style="fill:var(--fu)"/></marker>
+  <marker id="a-w" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" style="fill:var(--soft)"/></marker>
 </defs></svg>
 <div id="fallback"><h1>Spotkanie 1: Komunikacja międzyludzka i początki informatyki</h1>
 <p class="fb-note">Wersja uproszczona: ten widok otwiera się bez JavaScriptu (np. w podglądzie komunikatora). Żeby zobaczyć interaktywną tablicę ze strzałkami, otwórz plik w przeglądarce (Chrome, Safari, Edge).</p>
@@ -214,11 +227,11 @@ html.js-ok body.list { overflow:auto; height:auto; }
 <h3>Bez technik komunikacji nie byłoby cywilizacji, a ich rozwój przyspiesza: od mowy i pisma po telefon, komputer i internet</h3>
 <p class="fb-b">To spotkanie ma dwa wykłady: <a href="#fb-z-poco">komunikacja od mowy do radia i telewizji</a> oraz początek <a href="#fb-z-info">informatyki od abakusa do komputera</a>.</p>
 </article>
-<article id="fb-s-meta" class="fb-c"><p class="fb-m">Kto i kiedy · 01:11-01:33, 131:21-131:42</p>
+<article id="fb-s-meta" class="fb-c"><p class="fb-m">Kto i kiedy</p>
 <h3>Historia techniki, spotkanie 1: dwa wykłady jednego dnia</h3>
 <p class="fb-b">Prowadzący: profesor uczelni<br>Politechnika Rzeszowska, Wydział Budowy Maszyn i Lotnictwa, Katedra Nauki o Materiałach<br>Teams („Wykład 1”), 11.10.2026, początek 13:32, koniec 15:42</p>
 </article>
-<article id="fb-s-plan" class="fb-c"><p class="fb-m">Plan wykładu · 07:21-08:39</p>
+<article id="fb-s-plan" class="fb-c"><p class="fb-m">Plan wykładu</p>
 <h3>Prowadzący zapowiedział rys historyczny: mowa, alfabety i pisma, początki maszyn do pisania, druk Gutenberga, na koniec telegraf i początki telefonii</h3>
 <p class="fb-b">Temat: komunikacja międzyludzka w mowie i piśmie. Wykład poszedł szerzej, zob. <a href="#fb-s-spis">spis spotkania</a>.</p>
 </article>
@@ -226,630 +239,630 @@ html.js-ok body.list { overflow:auto; height:auto; }
 <h3>Spis: kolejność tematów spotkania</h3>
 <p class="fb-b"><b>Część 1 · komunikacja</b><br><a href="#fb-z-poco">Po co komunikacja</a>, <a href="#fb-z-def">czym jest</a>, <a href="#fb-z-trend">dokąd zmierza</a><br><a href="#fb-z-mowa">Mowa</a> i <a href="#fb-z-symb">symbole przed pismem</a><br><a href="#fb-z-pismo">Rodzaje pisma</a> i <a href="#fb-z-alf">alfabety</a><br><a href="#fb-z-nosn">Nośniki, narzędzia i druk</a><br><a href="#fb-z-masz">Maszyna do pisania</a><br><a href="#fb-z-kody">Kody i sygnały</a>, <a href="#fb-z-poczta">poczta</a><br><a href="#fb-z-tel">Telegraf i telefon</a>, <a href="#fb-z-radio">radio, telewizja, komputer</a><br><a href="#fb-z-rozw">Rozwinięcie tematu</a><br><b>Część 2 · informatyka</b><br><a href="#fb-z-info">Liczydła</a>, <a href="#fb-z-kalk">kalkulatory mechaniczne</a><br><a href="#fb-z-karty">Karty perforowane i IBM</a>, <a href="#fb-z-babb">Babbage i pierwszy program</a><br><b>Na końcu</b><br><a href="#fb-z-zaj">Informacje o zajęciach</a>, <a href="#fb-z-quiz">quiz i ściąga do testu</a></p>
 </article>
-<article id="fb-s-cover" class="fb-c"><p class="fb-m">Nagranie · 61:14-61:21, 77:38-77:44</p>
+<article id="fb-s-cover" class="fb-c"><p class="fb-m">Nagranie</p>
 <h3>132 minut nagrania, z przerwą w środku</h3>
 <p class="fb-b">Cały blok zajęć. Przerwa trwała od 61:21 do 77:38.</p>
 </article>
-<article id="fb-s-next" class="fb-c"><p class="fb-m">Dalszy ciąg · 101:26-101:31, 102:05-102:17, 131:00-131:42</p>
+<article id="fb-s-next" class="fb-c"><p class="fb-m">Dalszy ciąg</p>
 <h3>Kolejny wykład zacznie się od podziału komputerów na generacje</h3>
 <p class="fb-b">Prowadzący: „widzimy się za parę tygodni”. O komputerach i sieciach będzie <a href="#fb-z-babb">wykład kolejny</a>.</p>
 </article>
 </section>
 <section id="fb-z-poco"><h2>2. Po co komunikacja<small>08:40-09:09</small></h2>
-<article id="fb-p-root" class="fb-c"><p class="fb-m">Warunek · 08:40-08:45</p>
+<article id="fb-p-root" class="fb-c"><p class="fb-m">Warunek</p>
 <h3>Opanowanie technik komunikacji</h3>
 <p class="fb-b">Powstanie cywilizacji generalnie nie byłoby możliwe bez opanowania technik komunikacji.</p>
 <p class="fb-r">warunkuje → <a href="#fb-p1">Powstanie cywilizacji</a> · warunkuje → <a href="#fb-p2">Postęp techniczny</a> · warunkuje → <a href="#fb-p3">Rozwój cywilizacji</a> · warunkuje → <a href="#fb-p4">Społeczności</a></p>
 </article>
-<article id="fb-p1" class="fb-c"><p class="fb-m">Bez tego nie ma · 08:40</p>
+<article id="fb-p1" class="fb-c"><p class="fb-m">Bez tego nie ma</p>
 <h3>Powstanie cywilizacji byłoby niemożliwe</h3>
 </article>
-<article id="fb-p2" class="fb-c"><p class="fb-m">Bez tego nie ma · 08:45-08:50</p>
+<article id="fb-p2" class="fb-c"><p class="fb-m">Bez tego nie ma</p>
 <h3>Człowiek nie zainicjowałby postępu technicznego ani cywilizacyjnego</h3>
 </article>
-<article id="fb-p3" class="fb-c"><p class="fb-m">Bez tego nie ma · 08:50</p>
+<article id="fb-p3" class="fb-c"><p class="fb-m">Bez tego nie ma</p>
 <h3>Nie byłoby rozwoju cywilizacji</h3>
 </article>
-<article id="fb-p4" class="fb-c"><p class="fb-m">Bez tego nie ma · 09:00</p>
+<article id="fb-p4" class="fb-c"><p class="fb-m">Bez tego nie ma</p>
 <h3>Nie powstałyby nawet żadne społeczności</h3>
 <p class="fb-b">Bez umiejętności porozumiewania się człowiek nie stworzyłby jakichkolwiek społeczności.</p>
 </article>
 </section>
 <section id="fb-z-def"><h2>3. Czym jest komunikacja<small>09:09-09:42</small></h2>
-<article id="fb-f-root" class="fb-c"><p class="fb-m">Pojęcie · 09:09</p>
+<article id="fb-f-root" class="fb-c"><p class="fb-m">Pojęcie</p>
 <h3>Komunikacja ma więcej niż jedno znaczenie</h3>
 <p class="fb-r">może oznaczać → <a href="#fb-f1">Wymiana poglądów</a> · może oznaczać → <a href="#fb-f2">Przypadkowy sygnał</a> · ma wiele definicji → <a href="#fb-f126">126 definicji</a></p>
 </article>
-<article id="fb-f1" class="fb-c"><p class="fb-m">Znaczenie 1 · 09:11</p>
+<article id="fb-f1" class="fb-c"><p class="fb-m">Znaczenie 1</p>
 <h3>Celowa wymiana poglądów w dialogu</h3>
 </article>
-<article id="fb-f2" class="fb-c"><p class="fb-m">Znaczenie 2 · 09:18</p>
+<article id="fb-f2" class="fb-c"><p class="fb-m">Znaczenie 2</p>
 <h3>Przypadkowy sygnał</h3>
 <p class="fb-b">Komunikacją może być równie dobrze jakiś przypadkowy sygnał.</p>
 </article>
-<article id="fb-f126" class="fb-c"><p class="fb-m">Fakt · 09:26-09:42</p>
+<article id="fb-f126" class="fb-c"><p class="fb-m">Fakt</p>
 <h3>126 definicji komunikacji w 1970 r.</h3>
 <p class="fb-b">Podał je Frank Dance. Liczba ta od tego czasu <b>ciągle rośnie</b>.</p>
 </article>
 </section>
 <section id="fb-z-trend"><h2>4. Dokąd to zmierza<small>09:42-10:48</small></h2>
-<article id="fb-t-hub" class="fb-c"><p class="fb-m">Trend · 09:42</p>
+<article id="fb-t-hub" class="fb-c"><p class="fb-m">Trend</p>
 <h3>Z upływem czasu komunikacja rozwija się w czterech kierunkach</h3>
 <p class="fb-r">kierunek → <a href="#fb-t1">Więcej sposobów</a> · kierunek → <a href="#fb-t2">Bardziej złożone</a> · kierunek → <a href="#fb-t3">Łatwiej dostępne</a> · kierunek → <a href="#fb-t4">Szybciej i dalej</a></p>
 </article>
-<article id="fb-t1" class="fb-c"><p class="fb-m">Kierunek 1 · 09:42</p>
+<article id="fb-t1" class="fb-c"><p class="fb-m">Kierunek 1</p>
 <h3>Rośnie liczba możliwych sposobów komunikacji</h3>
 </article>
-<article id="fb-t2" class="fb-c"><p class="fb-m">Kierunek 2 · 09:49</p>
+<article id="fb-t2" class="fb-c"><p class="fb-m">Kierunek 2</p>
 <h3>Przesyłane informacje są coraz bardziej skomplikowane</h3>
 </article>
-<article id="fb-t3" class="fb-c"><p class="fb-m">Kierunek 3 · 09:49</p>
+<article id="fb-t3" class="fb-c"><p class="fb-m">Kierunek 3</p>
 <h3>Informacje są coraz łatwiej dostępne</h3>
 </article>
-<article id="fb-t4" class="fb-c"><p class="fb-m">Kierunek 4 · 09:49</p>
+<article id="fb-t4" class="fb-c"><p class="fb-m">Kierunek 4</p>
 <h3>Przesyłamy je szybciej i na większe odległości</h3>
 </article>
-<article id="fb-g1" class="fb-c"><p class="fb-m">Pokolenia · 09:58-10:06</p>
+<article id="fb-g1" class="fb-c"><p class="fb-m">Pokolenia</p>
 <h3>Przodkowie nie znali dzisiejszych technik komunikacji</h3>
 <p class="fb-r">potem → <a href="#fb-g2">Rodzice</a></p>
 </article>
-<article id="fb-g2" class="fb-c"><p class="fb-m">Pokolenia · 10:06-10:11</p>
+<article id="fb-g2" class="fb-c"><p class="fb-m">Pokolenia</p>
 <h3>Nawet nasi rodzice nie znali ich za młodu</h3>
 <p class="fb-r">potem → <a href="#fb-g3">Dziś</a></p>
 </article>
-<article id="fb-g3" class="fb-c"><p class="fb-m">Pokolenia · 09:58-10:06</p>
+<article id="fb-g3" class="fb-c"><p class="fb-m">Pokolenia</p>
 <h3>Dziś używamy tych technik</h3>
 <p class="fb-r">potem → <a href="#fb-g4">Dzieci</a></p>
 </article>
-<article id="fb-g4" class="fb-c"><p class="fb-m">Pokolenia · 10:11-10:26</p>
+<article id="fb-g4" class="fb-c"><p class="fb-m">Pokolenia</p>
 <h3>Nasze dzieci poznają technologie dziś opisywane tylko w science fiction</h3>
 <p class="fb-b">Prowadzący zakłada to z dużym prawdopodobieństwem.</p>
 </article>
-<article id="fb-m-spir" class="fb-c"><p class="fb-m">Mechanizm · 10:26-10:32</p>
+<article id="fb-m-spir" class="fb-c"><p class="fb-m">Mechanizm</p>
 <h3>Nowe, lepsze urządzenia komunikacji napędzają spiralę zmian w społeczeństwie</h3>
 <p class="fb-r">napędza → <a href="#fb-tm2">Tempo dziś</a></p>
 </article>
-<article id="fb-tm1" class="fb-c"><p class="fb-m">Tempo · dawniej · 10:32-10:48</p>
+<article id="fb-tm1" class="fb-c"><p class="fb-m">Tempo · dawniej</p>
 <h3>Najstarsze wynalazki dzieliły ogromne przedziały czasowe</h3>
 <p class="fb-b">Stąd w prezentacji wzmianka o <b>ewolucji sposobów komunikacji</b>.</p>
 <p class="fb-r">przechodzi w → <a href="#fb-tm2">Tempo dziś</a></p>
 </article>
-<article id="fb-tm2" class="fb-c"><p class="fb-m">Tempo · dziś · 10:48</p>
+<article id="fb-tm2" class="fb-c"><p class="fb-m">Tempo · dziś</p>
 <h3>Dziś postęp rośnie lawinowo</h3>
 </article>
 </section>
 <section id="fb-z-mowa"><h2>5. Mowa<small>11:02-15:07</small></h2>
-<article id="fb-mo-ewol" class="fb-c"><p class="fb-m">Pochodzenie · 11:02-11:25</p>
+<article id="fb-mo-ewol" class="fb-c"><p class="fb-m">Pochodzenie</p>
 <h3>Ewolucja mózgu odróżniła człowieka od zwierząt i doprowadziła do mowy</h3>
 <p class="fb-b">Człowiek wydzielił się z linii człowiekowatych. Mowa to rewolucyjny sposób komunikacji.</p>
 <p class="fb-r">doprowadziła do → <a href="#fb-mo-def">Czym jest mowa</a></p>
 </article>
-<article id="fb-mo-foxp2" class="fb-c"><p class="fb-m">Hipoteza · 11:25-11:45</p>
+<article id="fb-mo-foxp2" class="fb-c"><p class="fb-m">Hipoteza</p>
 <h3>Zakłada się, że duże znaczenie miał gen FOXP2, który 200 tys. lat temu dał zdolności językowe</h3>
 <p class="fb-r">dał zdolności → <a href="#fb-mo-def">Czym jest mowa</a></p>
 </article>
-<article id="fb-mo-def" class="fb-c"><p class="fb-m">Definicja · 11:45-11:53</p>
+<article id="fb-mo-def" class="fb-c"><p class="fb-m">Definicja</p>
 <h3>Mowa to zbiór wokalnych symboli opartych na logicznej strukturze</h3>
 <p class="fb-r">umożliwiła → <a href="#fb-mo-zal">Wiedza dla pokoleń</a> · umożliwiła → <a href="#fb-mo-szczyt">Szczyt łańcucha</a> · umożliwiła → <a href="#fb-mo-ekspansja">Ekspansja człowieka</a></p>
 </article>
-<article id="fb-mo-zal" class="fb-c"><p class="fb-m">Zaleta · 11:53-12:09</p>
+<article id="fb-mo-zal" class="fb-c"><p class="fb-m">Zaleta</p>
 <h3>Mowa pozwoliła przekazywać informacje i wiedzę kolejnym pokoleniom w doskonalszy sposób</h3>
 </article>
-<article id="fb-mo-szczyt" class="fb-c"><p class="fb-m">Zaleta · 12:09-12:25</p>
+<article id="fb-mo-szczyt" class="fb-c"><p class="fb-m">Zaleta</p>
 <h3>Mowa ulokowała człowieka na szczycie łańcucha pokarmowego</h3>
 <p class="fb-b">Umożliwiła homo sapiens walkę i zwycięstwa nad zwierzęcymi drapieżnikami.</p>
 </article>
-<article id="fb-mo-ekspansja" class="fb-c"><p class="fb-m">Zaleta · 12:25-12:40</p>
+<article id="fb-mo-ekspansja" class="fb-c"><p class="fb-m">Zaleta</p>
 <h3>Mowa umożliwiła ekspansję człowieka na wszystkie rejony Ziemi</h3>
 <p class="fb-b">Pośrednio też podróże przez niesprzyjające tereny, np. morza i pustynie.</p>
 <p class="fb-r">jednak → <a href="#fb-mo-nie">Mowa niedoskonała</a></p>
 </article>
-<article id="fb-mo-nie" class="fb-c"><p class="fb-m">Ograniczenia · 12:40-12:57</p>
+<article id="fb-mo-nie" class="fb-c"><p class="fb-m">Ograniczenia</p>
 <h3>Mowa, mimo że przełomowa, nie jest środkiem komunikacji doskonałym</h3>
 <p class="fb-r">ograniczenie 1 → <a href="#fb-mo-zasieg">Zasięg mowy</a> · ograniczenie 2 → <a href="#fb-mo-pamiec">Pamięć ludzka</a> · ograniczenie 3 → <a href="#fb-mo-smierc">Śmierć nosicieli wiedzy</a></p>
 </article>
-<article id="fb-mo-zasieg" class="fb-c"><p class="fb-m">Ograniczenie 1 · 12:57-13:27</p>
+<article id="fb-mo-zasieg" class="fb-c"><p class="fb-m">Ograniczenie 1</p>
 <h3>Pierwsze ograniczenie to zasięg: słowo docierało tylko do osób w pobliżu mówiącego</h3>
 <p class="fb-b">Głosem lub sygnałami migowymi na odległość większą niż kilometr komunikacja była praktycznie niemożliwa, „do czasu”.</p>
 </article>
-<article id="fb-mo-pamiec" class="fb-c"><p class="fb-m">Ograniczenie 2 · 13:27-13:42</p>
+<article id="fb-mo-pamiec" class="fb-c"><p class="fb-m">Ograniczenie 2</p>
 <h3>Drugie ograniczenie to pamięć: z czasem się zniekształca i można zapamiętać ograniczoną ilość informacji</h3>
 </article>
-<article id="fb-mo-smierc" class="fb-c"><p class="fb-m">Ograniczenie 3 · 13:42-14:18</p>
+<article id="fb-mo-smierc" class="fb-c"><p class="fb-m">Ograniczenie 3</p>
 <h3>Trzecie ograniczenie: wiedza umierała razem z osobami, które nie zdążyły jej przekazać</h3>
 <p class="fb-b">Szamani i mędrcy, którzy zmarli przedwcześnie, nie przekazali wiedzy uczniom. Prymitywna społeczność bezpowrotnie traciła wiedzę wielu pokoleń.</p>
 <p class="fb-r">skutek → <a href="#fb-mo-wyjscie">Szukanie lepszego sposobu</a></p>
 </article>
-<article id="fb-mo-wyjscie" class="fb-c"><p class="fb-m">Skutek · 14:18-14:30</p>
+<article id="fb-mo-wyjscie" class="fb-c"><p class="fb-m">Skutek</p>
 <h3>Niedoskonałości mowy prowadziły do prób stworzenia lepszego sposobu przekazywania i przechowywania informacji</h3>
 <p class="fb-r">dwa rodzaje → <a href="#fb-mo-dwa">Dwa rodzaje technik</a></p>
 </article>
-<article id="fb-mo-dwa" class="fb-c"><p class="fb-m">Podział · 14:30-14:49</p>
+<article id="fb-mo-dwa" class="fb-c"><p class="fb-m">Podział</p>
 <h3>Rozwijane techniki dzielą się na dwa rodzaje: komunikację na odległość i komunikację w czasie</h3>
 <p class="fb-b">Ta druga nadaje wiedzy ludzkiej trwałość.</p>
 <p class="fb-r">opierają się na → <a href="#fb-mo-symb">Wspólny element: symbole</a></p>
 </article>
-<article id="fb-mo-symb" class="fb-c"><p class="fb-m">Przejście · 14:49-15:07</p>
+<article id="fb-mo-symb" class="fb-c"><p class="fb-m">Przejście</p>
 <h3>Wszystkie te techniki opierały się na wspólnym elemencie: symbolach</h3>
 <p class="fb-b">Najstarsze znane symbole do komunikacji w przestrzeni i czasie to <a href="#fb-sy-jask">malowidła jaskiniowe</a>.</p>
 </article>
 </section>
 <section id="fb-z-symb"><h2>6. Symbole przed pismem<small>14:59-20:02</small></h2>
-<article id="fb-sy-jask" class="fb-c"><p class="fb-m">Najstarsze symbole · 14:59-15:35</p>
+<article id="fb-sy-jask" class="fb-c"><p class="fb-m">Najstarsze symbole</p>
 <h3>Malowidła jaskiniowe to najstarsze znane symbole komunikacji w przestrzeni i czasie</h3>
 <p class="fb-b">Dla dzieci i dla prehistorycznego człowieka obrazki były najłatwiejsze do opanowania. Slajd: rekonstrukcja malowidła bizona i malowidło skalne ze stadem zwierząt.</p>
 <p class="fb-r">przykład → <a href="#fb-sy-kal">Kalendarz Cro-Magnon</a> · ewolucja → <a href="#fb-sy-ryz">Od rysunku do pisma</a></p>
 </article>
-<article id="fb-sy-kal" class="fb-c"><p class="fb-m">Przykład · 15:46-16:47</p>
+<article id="fb-sy-kal" class="fb-c"><p class="fb-m">Przykład</p>
 <h3>Cro-Magnon ok. 30 tys. lat p.n.e. stworzył pierwszy kalendarz astronomiczny, wyryty na kle mamuta</h3>
 <p class="fb-b">Zapis obserwacji nieba nocą z fazami Księżyca. Slajd: kieł z Gontzi na Ukrainie z ok. 15 tys. lat temu; takich artefaktów są tysiące z okresu sprzed 30 tys. lat. Schemat pokazuje cykle czterech miesięcy księżycowych.</p>
 </article>
-<article id="fb-sy-ryz" class="fb-c"><p class="fb-m">Ewolucja · 16:47-17:13</p>
+<article id="fb-sy-ryz" class="fb-c"><p class="fb-m">Ewolucja</p>
 <h3>Powoli następowała ewolucja od rysowania do pisania</h3>
 <p class="fb-b">W starożytnym Egipcie i Grecji pisanie i rysowanie były tożsame: egipskie „sesh” i greckie „grafein” znaczyły jedno i drugie.</p>
 <p class="fb-r">ale → <a href="#fb-sy-krok">Krok do symboli</a></p>
 </article>
-<article id="fb-sy-krok" class="fb-c"><p class="fb-m">Chronologia · 17:13-17:54</p>
+<article id="fb-sy-krok" class="fb-c"><p class="fb-m">Chronologia</p>
 <h3>Od malowideł do pierwszych symboli jest krok ogromny, długi w czasie i w rozwoju intelektualnym</h3>
 <p class="fb-b">Najstarsze malowidła, rzeźby i narzędzia: późny paleolit, ok. 25 tys. lat p.n.e. Pierwsze symbole, czyli petroglify: neolit, 10-9 tys. lat p.n.e.</p>
 <p class="fb-r">obok malowideł → <a href="#fb-sy-mniej">Mniej trwałe symbole</a> · obok malowideł → <a href="#fb-sy-mnem">Środki mnemotechniczne</a></p>
 </article>
-<article id="fb-sy-mniej" class="fb-c"><p class="fb-m">Symbole · 17:54-18:41</p>
+<article id="fb-sy-mniej" class="fb-c"><p class="fb-m">Symbole</p>
 <h3>Wcześniej używano mniej trwałych symboli, które nie przetrwały</h3>
 <p class="fb-b">Np. stosy kamieni, znaki w drewnie lub ziemi. Wiemy o tym z obserwacji bliższych nam kultur Oceanii i Afryki.</p>
 <p class="fb-r">prowadziły do → <a href="#fb-sy-prek">Prekursor pisma</a></p>
 </article>
-<article id="fb-sy-mnem" class="fb-c"><p class="fb-m">Pamięć · 18:41-19:32</p>
+<article id="fb-sy-mnem" class="fb-c"><p class="fb-m">Pamięć</p>
 <h3>Środki mnemotechniczne to narzędzia pomagające zapamiętywać i są równie stare</h3>
 <p class="fb-b">Obrabiane kamienie (późny paleolit), węzły na sznurach (peruwiańskie kipu), karby na drzewie, tatuaże całego ciała w Oceanii, później herby, proporce i pieczęcie.</p>
 <p class="fb-r">prowadziły do → <a href="#fb-sy-prek">Prekursor pisma</a></p>
 </article>
-<article id="fb-sy-prek" class="fb-c"><p class="fb-m">Skutek · 19:32-20:02</p>
+<article id="fb-sy-prek" class="fb-c"><p class="fb-m">Skutek</p>
 <h3>Symbole były prekursorem kolejnego wielkiego wynalazku, pisma</h3>
 <p class="fb-b">Zamknięty wzór symboli wyrażających dźwięki fonetyczne lub pojęcia pozwolił przechowywać długie, skomplikowane wiadomości: to graficzny zapis mowy.</p>
 </article>
 </section>
 <section id="fb-z-pismo"><h2>7. Rodzaje pisma<small>20:02-30:12</small></h2>
-<article id="fb-pi-waga" class="fb-c"><p class="fb-m">Waga pisma · 20:02-20:49</p>
+<article id="fb-pi-waga" class="fb-c"><p class="fb-m">Waga pisma</p>
 <h3>Pismo było darzone wielkim szacunkiem, a jego twórców upatrywano wśród bogów</h3>
 <p class="fb-b">Egipt: Tot (bóg kultury, nauki i magii). Babilon: Nabu, syn Marduka (bóg pisma i ludzkiego przeznaczenia). Tradycja żydowska: Mojżesz. Mity greckie: Hermes. W Chinach urzędnicy (literati) uważali czytanie i pisanie za jedną z najważniejszych cech wykształconego człowieka.</p>
 </article>
-<article id="fb-pi-data" class="fb-c"><p class="fb-m">Chronologia · 20:49-21:20</p>
+<article id="fb-pi-data" class="fb-c"><p class="fb-m">Chronologia</p>
 <h3>Dokładna data powstania pisma jest sporna</h3>
 <p class="fb-b">Pierwsze piktogramy i ideogramy: ok. 9 tys. lat p.n.e. Pismo nie wcześniej niż ok. 5 tys. lat p.n.e., bo staroeuropejskie znaki z Vinča są nieodczytane i uchodzą za motywy zdobnicze.</p>
 <p class="fb-r">najstarsze znane → <a href="#fb-pi-najst">Najstarsze pismo</a></p>
 </article>
-<article id="fb-pi-najst" class="fb-c"><p class="fb-m">Najstarsze · 21:20-21:44</p>
+<article id="fb-pi-najst" class="fb-c"><p class="fb-m">Najstarsze</p>
 <h3>Za najstarsze znane pismo uważa się sumeryjskie piktogramy z ok. 3400 r. p.n.e.</h3>
 <p class="fb-b">Mniej więcej w tym samym czasie powstały hieroglify i symbole protoelamickie.</p>
 <p class="fb-r">najstarszy rodzaj → <a href="#fb-pi-pikto">Piktogramy</a></p>
 </article>
-<article id="fb-pi-pikto" class="fb-c"><p class="fb-m">Piktogramy · 21:44-22:20</p>
+<article id="fb-pi-pikto" class="fb-c"><p class="fb-m">Piktogramy</p>
 <h3>Piktogram to pismo obrazkowe: obraz lub rysunek przedmiotu jest symbolem zjawiska</h3>
 <p class="fb-b">Nie przedstawia dźwięku mowy, więc to alfabet semantyczny, nie fonetyczny. Petroglify rozwinęły się z malowideł, a z petroglifów piktogramy.</p>
 <p class="fb-r">w odróżnieniu od petroglifów → <a href="#fb-pi-rozn">Petroglif a piktogram</a> · kolejny krok → <a href="#fb-pi-ideo">Ideogramy</a></p>
 </article>
-<article id="fb-pi-rozn" class="fb-c"><p class="fb-m">Różnica · 22:20-23:26</p>
+<article id="fb-pi-rozn" class="fb-c"><p class="fb-m">Różnica</p>
 <h3>Petroglif przedstawia wydarzenie, a piktogram o nim opowiada, więc ma znaczenie użytkowe</h3>
 <p class="fb-b">Slajdy: przybycie misjonarzy na wyspę Hispaniola (piktogram z 1510 r.) i piktogram Siuksów o wyprawie handlarza muszli Małego Kruka (dwie łódki: dwa razy przepłynął wodę).</p>
 </article>
-<article id="fb-pi-ideo" class="fb-c"><p class="fb-m">Ideogramy · 23:26-24:11</p>
+<article id="fb-pi-ideo" class="fb-c"><p class="fb-m">Ideogramy</p>
 <h3>Ideogram przedstawia ideę, a nie przedmiot: to kolejny krok w ewolucji zapisywania myśli</h3>
 <p class="fb-b">Nazwa od gr. „eikon”, obraz. Koło jako piktogram to przedmiot okrągły; jako ideogram: gorąco, światło, dzień, bóg słońca. Dwie kreski: nogi albo „iść”, podróż.</p>
 <p class="fb-r">cecha → <a href="#fb-pi-podob">Podobne znaczenia</a> · wada → <a href="#fb-pi-pozno">Pisma ideograficzne</a></p>
 </article>
-<article id="fb-pi-podob" class="fb-c"><p class="fb-m">Cecha · 24:11-24:34</p>
+<article id="fb-pi-podob" class="fb-c"><p class="fb-m">Cecha</p>
 <h3>Najwcześniejsze symbole mają podobne znaczenia niezależnie od kultury</h3>
 <p class="fb-b">Oko z łzą oznacza smutek u Indian Kalifornii, w piśmie Azteków oraz we wczesnych pismach chińskich i egipskich.</p>
 </article>
-<article id="fb-pi-pozno" class="fb-c"><p class="fb-m">Wada · 24:34-25:17</p>
+<article id="fb-pi-pozno" class="fb-c"><p class="fb-m">Wada</p>
 <h3>Czysto ideograficzne pisma powstały stosunkowo późno i są mniej wygodne niż pisma analityczne i analityczno-fonetyczne</h3>
 <p class="fb-b">Najstarsze pisma ideograficzne pochodzą z tego samego okresu co najstarsze piktogramy.</p>
 <p class="fb-r">np. → <a href="#fb-pi-klin">Pismo klinowe</a></p>
 </article>
-<article id="fb-pi-chin" class="fb-c"><p class="fb-m">Przykład ze slajdu · 25:17-26:16</p>
+<article id="fb-pi-chin" class="fb-c"><p class="fb-m">Przykład ze slajdu</p>
 <h3>Chiński ideogram „dziecko pod dachem” dawniej znaczył troskę, a dziś znak</h3>
 <p class="fb-b">Z czasem ideogramy oddalały się od obrazków, ale zachowały zasadę: znak to konkretne pojęcie. Występują w kanji (Japonia) i hanja (Korea), wywodzących się z chińskich znaków.</p>
 </article>
-<article id="fb-pi-klin" class="fb-c"><p class="fb-m">Przykład · 26:16-27:04</p>
+<article id="fb-pi-klin" class="fb-c"><p class="fb-m">Przykład</p>
 <h3>Sumeryjskie pismo klinowe jest przykładem pisma ideograficznego</h3>
 <p class="fb-b">Slajd: ewolucja japońskich piktogramów i ideogramów, od malowideł do ideogramów (w rzędach od lewej: najstarsze po prawej najnowsze).</p>
 <p class="fb-r">kolejny rodzaj → <a href="#fb-pi-anal">Pisma analityczne</a></p>
 </article>
-<article id="fb-pi-anal" class="fb-c"><p class="fb-m">Pisma analityczne · 27:04-27:36</p>
+<article id="fb-pi-anal" class="fb-c"><p class="fb-m">Pisma analityczne</p>
 <h3>Pisma analityczne to faza przejściowa między ideograficznymi a czysto fonetycznymi</h3>
 <p class="fb-b">Egipcjanie, Kreteńczycy, Hetyci i mieszkańcy Mezopotamii: słowa zbudowane z symboli łączonych w kombinacje, z elementami obu rodzajów pisma.</p>
 <p class="fb-r">przykład → <a href="#fb-pi-hier">Hieroglify</a></p>
 </article>
-<article id="fb-pi-plynna" class="fb-o"><p class="fb-m">Uwaga wykładowcy · 27:36-27:54</p>
+<article id="fb-pi-plynna" class="fb-o"><p class="fb-m">Uwaga wykładowcy</p>
 <h3>Granica między pismem ideograficznym a analitycznym jest płynna</h3>
 <p class="fb-b">Wiele opracowań naukowych nie rozróżnia tych dwóch rodzajów.</p>
 </article>
-<article id="fb-pi-hier" class="fb-c"><p class="fb-m">Hieroglify · 27:54-28:52</p>
+<article id="fb-pi-hier" class="fb-c"><p class="fb-m">Hieroglify</p>
 <h3>Najbardziej znany przykład pisma analitycznego to hieroglify egipskie; najstarszy datowany jest na 3300 r. p.n.e.</h3>
 <p class="fb-b">Trzy elementy: znaki ideograficzne (ankh = życie, pióro = prawda), znaki fonetyczne (spółgłoskowe, 1-3 spółgłoski) i determinatywy przed słowem określające klasę wyrazów (imiona bóstw poprzedza siedząca figurka boga).</p>
 <p class="fb-r">kolejny rodzaj → <a href="#fb-pi-sylab">Sylabariusze</a></p>
 </article>
-<article id="fb-pi-sylab" class="fb-c"><p class="fb-m">Sylabariusze · 28:52-29:47</p>
+<article id="fb-pi-sylab" class="fb-c"><p class="fb-m">Sylabariusze</p>
 <h3>Sylabariusze to pisma fonetyczno-sylabiczne: znaki oznaczają samogłoski lub sylaby przekazujące słowo mówione</h3>
 <p class="fb-b">Występowały w Europie i na Bliskim Wschodzie: babiloński (ok. 3000 p.n.e.), minojski Linear B (1400 p.n.e.), aksumicki (500 p.n.e.), także w Afryce Zachodniej, Ameryce Północnej i Azji. Dziś Japonia używa dwóch: katakany i hiragany.</p>
 </article>
 </section>
 <section id="fb-z-alf"><h2>8. Alfabety<small>30:12-33:41</small></h2>
-<article id="fb-al-sylmin" class="fb-c"><p class="fb-m">Wada · 30:21-31:06</p>
+<article id="fb-al-sylmin" class="fb-c"><p class="fb-m">Wada</p>
 <h3>Sylabariusze są trudniejsze do nauki niż alfabety i stanowią ślepą uliczkę ewolucji pisma</h3>
 <p class="fb-b">Wydają się logiczniejsze i prostsze, ale potrzebują znacznie więcej symboli niż alfabet (przy w pełni sylabicznym: liczba samogłosek razy liczba spółgłosek), podobnie jak ideogramy. Mimo to chiński i japoński opierają się na sylabariuszach.</p>
 <p class="fb-r">w przeciwieństwie do → <a href="#fb-al-start">Najstarszy alfabet</a></p>
 </article>
-<article id="fb-al-start" class="fb-c"><p class="fb-m">Początek · 31:06-31:23</p>
+<article id="fb-al-start" class="fb-c"><p class="fb-m">Początek</p>
 <h3>Najstarszy znany alfabet pochodzi z ok. 2000 r. p.n.e.</h3>
 <p class="fb-b">Używali go w Egipcie Semici, którzy nadali hieroglifom nowe nazwy. Początkowo tylko spółgłoski miały swoje fonemy.</p>
 <p class="fb-r">mutacje alfabetu → <a href="#fb-al-fen">Fenicki i grecki</a></p>
 </article>
-<article id="fb-al-fen" class="fb-c"><p class="fb-m">Ewolucja · 29:47-30:20, 31:23-31:52</p>
+<article id="fb-al-fen" class="fb-c"><p class="fb-m">Ewolucja</p>
 <h3>Alfabet fenicki (ok. 1200 r. p.n.e.) zapoczątkował włączanie samogłosek, a starogrecki (ok. 900 r. p.n.e.) je wprowadził</h3>
 <p class="fb-b">Alfabet grecki jest w środku alfabetów cywilizacji europejskiej. Slajd: rozwój alfabetów od kananejskiego przez fenicki, skąd odgałęził się grecki, a z greckiego wzięła się cyrylica.</p>
 <p class="fb-r">z greckiego → <a href="#fb-al-rz">Etruski i rzymski</a></p>
 </article>
-<article id="fb-al-rz" class="fb-c"><p class="fb-m">Ewolucja · 31:52-32:24</p>
+<article id="fb-al-rz" class="fb-c"><p class="fb-m">Ewolucja</p>
 <h3>Z greckiego wywodzą się alfabet etruski, rzymski (ok. 600 r. p.n.e.) i dzisiejsze alfabety łacińskie</h3>
 <p class="fb-r">z rzymskiego → <a href="#fb-al-lac">Małe litery i J, W, U</a></p>
 </article>
-<article id="fb-al-lac" class="fb-c"><p class="fb-m">Ewolucja · 32:24-33:07</p>
+<article id="fb-al-lac" class="fb-c"><p class="fb-m">Ewolucja</p>
 <h3>Alfabet rzymski miał tylko duże litery, a średniowieczny łaciński dodał małe litery oraz J, W i U</h3>
 <p class="fb-b">Lokalne języki dodają własne litery. W polskim są symbole tylko nasze: ś, ć, ź, rz i tak dalej.</p>
 <p class="fb-r">przetrwał → <a href="#fb-al-wazn">Znaczenie alfabetu</a></p>
 </article>
-<article id="fb-al-wazn" class="fb-c"><p class="fb-m">Znaczenie · 33:07-33:41</p>
+<article id="fb-al-wazn" class="fb-c"><p class="fb-m">Znaczenie</p>
 <h3>Alfabet fonetyczny przetrwał mimo druku, maszyn do pisania, komputerów i natychmiastowej łączności</h3>
 <p class="fb-b">Odniósł zwycięstwo nad innymi rodzajami pisma. Uniwersalność, prostota, możliwość adaptacji i użyteczność czynią go jednym z najważniejszych wynalazków technik komunikacji.</p>
 </article>
 </section>
 <section id="fb-z-nosn"><h2>9. Nośniki, narzędzia i druk<small>33:41-44:19</small></h2>
-<article id="fb-no-glina" class="fb-c"><p class="fb-m">Nośnik · 33:41-34:52</p>
+<article id="fb-no-glina" class="fb-c"><p class="fb-m">Nośnik</p>
 <h3>Przełomem w utrwalaniu pisma były gliniane tabliczki</h3>
 <p class="fb-b">Wcześniej służyły kamienne rylce i organiczne farby na kamieniu. Glina łatwo przyjmuje znaki, a po wysuszeniu lub później po wypaleniu daje bardzo trwały zapis mowy.</p>
 <p class="fb-r">wada → <a href="#fb-no-wada">Wada tabliczek</a> · kolejny nośnik → <a href="#fb-no-papir">Papirus i papier</a></p>
 </article>
-<article id="fb-no-wada" class="fb-c"><p class="fb-m">Wada · 34:52-35:08</p>
+<article id="fb-no-wada" class="fb-c"><p class="fb-m">Wada</p>
 <h3>Kamienne i gliniane tabliczki były ciężkie i zajmowały dużo miejsca</h3>
 </article>
-<article id="fb-no-papir" class="fb-c"><p class="fb-m">Nośnik · 35:08-35:43</p>
+<article id="fb-no-papir" class="fb-c"><p class="fb-m">Nośnik</p>
 <h3>Papirus i papier były poręczniejsze w składowaniu i przenoszeniu</h3>
 <p class="fb-b">Papirus: ok. 3000 p.n.e., Egipt. Papier: Chiny, od 100 r. n.e., m.in. z bawełny.</p>
 <p class="fb-r">historia → <a href="#fb-no-papbliz">Papier na Bliskim Wschodzie</a> · potem → <a href="#fb-no-masow">Masowy papier</a></p>
 </article>
-<article id="fb-no-papbliz" class="fb-c"><p class="fb-m">Historia · 35:48-36:18</p>
+<article id="fb-no-papbliz" class="fb-c"><p class="fb-m">Historia</p>
 <h3>Technologia papieru trafiła na Bliski Wschód ok. 700 r. po bitwie turecko-chińskiej</h3>
 <p class="fb-b">Pojmano Chińczyków, którzy znali technologię produkcji papieru.</p>
 </article>
-<article id="fb-no-masow" class="fb-c"><p class="fb-m">Nośnik · 36:18-36:36</p>
+<article id="fb-no-masow" class="fb-c"><p class="fb-m">Nośnik</p>
 <h3>Masowa produkcja papieru to XIX w. w Europie: maszyny parowe przerabiają miazgę drzewną</h3>
 <p class="fb-r">ciekawostka → <a href="#fb-no-cieka">Ciekawostka: bawełna</a></p>
 </article>
-<article id="fb-no-cieka" class="fb-c"><p class="fb-m">Ciekawostka · 36:36-39:15</p>
+<article id="fb-no-cieka" class="fb-c"><p class="fb-m">Ciekawostka</p>
 <h3>Brak bawełny na papier skłonił króla Anglii do zakazu chowania zmarłych w białych bawełnianych ubraniach</h3>
 <p class="fb-b">Na początku rewolucji przemysłowej rosło zapotrzebowanie na papier (patenty, książki o mechanice maszyn). Uratował sytuację pierwszy wybielacz (papier z kolorowych ubrań), potem miazga drzewna. Jej pomysłodawca miał skopiować osy budujące gniazdo z przeżutej kory; prowadzący: „ile w tym prawdy?”.</p>
 </article>
-<article id="fb-no-piora" class="fb-c"><p class="fb-m">Narzędzie · 39:15-40:17</p>
+<article id="fb-no-piora" class="fb-c"><p class="fb-m">Narzędzie</p>
 <h3>Ptasie pióra są puste w środku: skośnie ścięte tworzyły końcówkę piszącą, a komora służyła jako zbiornik na atrament</h3>
 <p class="fb-b">Najstarsze wzmianki o wiecznych piórach: X w. Pióra zbliżone do dzisiejszych: początek XIX w.</p>
 <p class="fb-r">kolejne narzędzie → <a href="#fb-no-olowek">Ołówek</a></p>
 </article>
-<article id="fb-no-olowek" class="fb-c"><p class="fb-m">Narzędzie · 40:17-41:44</p>
+<article id="fb-no-olowek" class="fb-c"><p class="fb-m">Narzędzie</p>
 <h3>Ołówki są stosunkowo młodym wynalazkiem: XVI w., Anglia, złoże wysokiej jakości grafitu</h3>
 <p class="fb-b">Monopol Anglii trwał ponad wiek. Za twórcę uważa się Konrada Gessnera, który oprawił grafit w drewno, bo brudził palce. Sądził, że to ołów, stąd nazwa.</p>
 </article>
-<article id="fb-no-cezar" class="fb-c"><p class="fb-m">Książka i gazeta · 41:44-42:42</p>
+<article id="fb-no-cezar" class="fb-c"><p class="fb-m">Książka i gazeta</p>
 <h3>Juliuszowi Cezarowi przypisuje się rozkaz stworzenia pierwszej książki w dzisiejszej postaci i pierwszej gazety</h3>
 <p class="fb-b">Książka: kartki sklejone na grzbiecie i okładki. Gazeta: Acta Diurna, 59 r. p.n.e.</p>
 <p class="fb-r">potem → <a href="#fb-no-druk">Druk</a></p>
 </article>
-<article id="fb-no-druk" class="fb-c"><p class="fb-m">Druk · 42:42-43:37</p>
+<article id="fb-no-druk" class="fb-c"><p class="fb-m">Druk</p>
 <h3>Czcionki wynaleziono w Chinach (Pi Sheng, 1045), ale rewolucja nastąpiła w Europie w XV w. dzięki Gutenbergowi</h3>
 <p class="fb-b">Chiny miały mały popyt na książki. Nie wiadomo, na ile Gutenberg znał chińskie maszyny. Wtedy też wynaleziono atrament na bazie oleju i usprawniono produkcję papieru.</p>
 <p class="fb-r">skutek → <a href="#fb-no-druk2">Skutki druku</a></p>
 </article>
-<article id="fb-no-druk2" class="fb-c"><p class="fb-m">Skutek · 43:37-44:19</p>
+<article id="fb-no-druk2" class="fb-c"><p class="fb-m">Skutek</p>
 <h3>Druk obniżył koszt książek, a rynek na Biblię zwracał koszty, co obniżyło analfabetyzm</h3>
 <p class="fb-b">Wynalazek walnie przyczynił się do rozpowszechniania książek i kultury słowa pisanego w Europie.</p>
 </article>
 </section>
 <section id="fb-z-masz"><h2>10. Maszyna do pisania<small>44:19-61:14</small></h2>
-<article id="fb-ma-intro" class="fb-c"><p class="fb-m">Wprowadzenie · 44:19-44:42</p>
+<article id="fb-ma-intro" class="fb-c"><p class="fb-m">Wprowadzenie</p>
 <h3>Maszyna do pisania to specyficzny typ maszyny drukarskiej z XIX w., ale trudno wskazać jednoznaczną datę jej powstania</h3>
 <p class="fb-b">Powód: wiele patentów i ich rozwinięć.</p>
 <p class="fb-r">pierwsza wzmianka → <a href="#fb-ma-mill">Henry Mill</a> · przełom → <a href="#fb-ma-sholes">Sholes i Remington</a></p>
 </article>
-<article id="fb-ma-mill" class="fb-c"><p class="fb-m">Pierwsza wzmianka · 44:42-45:43</p>
+<article id="fb-ma-mill" class="fb-c"><p class="fb-m">Pierwsza wzmianka</p>
 <h3>Henry Mill dostał w 1714 r. patent od królowej Anny, ale nie zbudował maszyny</h3>
 <p class="fb-b">Nie zachował się szkic ani opis jego projektu.</p>
 <p class="fb-r">potem → <a href="#fb-ma-fou">Foucault</a></p>
 </article>
-<article id="fb-ma-fou" class="fb-c"><p class="fb-m">Nieudany wynalazek · 45:43-46:47</p>
+<article id="fb-ma-fou" class="fb-c"><p class="fb-m">Nieudany wynalazek</p>
 <h3>Foucault wymyślił „machinę przeciw skurczowi palców”, ale pisanie ręczne było szybsze</h3>
 <p class="fb-b">Pierwsza połowa XIX w. Francuski medyk, matematyk i fizyk; urzędnicy skarżyli się na przykurcze od przepisywania. Maszyna wymagała zbyt dużej zręczności.</p>
 <p class="fb-r">potem → <a href="#fb-ma-drais">Piszące pianino</a></p>
 </article>
-<article id="fb-ma-drais" class="fb-c"><p class="fb-m">Nieudany wynalazek · 46:47-47:20</p>
+<article id="fb-ma-drais" class="fb-c"><p class="fb-m">Nieudany wynalazek</p>
 <h3>Carl Dreyse w 1823 r. zbudował piszące pianino, ale ręczny kopista był szybszy</h3>
 <p class="fb-b">To ten sam, który skonstruował pierwszy welocyped, przodka roweru. Na jedną literę trzeba było poruszyć pięć dźwigni.</p>
 <p class="fb-r">potem → <a href="#fb-ma-burt">Typograf z 1829</a></p>
 </article>
-<article id="fb-ma-burt" class="fb-c"><p class="fb-m">Wynalazek · 47:20-47:54</p>
+<article id="fb-ma-burt" class="fb-c"><p class="fb-m">Wynalazek</p>
 <h3>W 1829 r. Amerykanin William Austin Burt zbudował maszynę „typograf”, która spłonęła w pożarze Urzędu Patentowego w Waszyngtonie</h3>
 <p class="fb-b">Seryjna produkcja maszyn w Europie ruszyła mniej więcej wtedy, gdy Sholes opatentował swoją.</p>
 <p class="fb-r">potem → <a href="#fb-ma-progin">Plume typographique</a></p>
 </article>
-<article id="fb-ma-progin" class="fb-c"><p class="fb-m">Wynalazek · 47:54-48:54</p>
+<article id="fb-ma-progin" class="fb-c"><p class="fb-m">Wynalazek</p>
 <h3>W 1833 r. Xavier Progin z Marsylii zbudował „plume typographique” z 66 dźwigniami i 132 znakami</h3>
 <p class="fb-b">Czcionki barwione poruszały się do środka koła z dźwigni. Więcej o mechanizmie nie zanotowano.</p>
 <p class="fb-r">potem → <a href="#fb-ma-bien">Frenotypia Bieniowskiego</a></p>
 </article>
-<article id="fb-ma-bien" class="fb-c"><p class="fb-m">Polski akcent · 48:54-49:29</p>
+<article id="fb-ma-bien" class="fb-c"><p class="fb-m">Polski akcent</p>
 <h3>W 1831 r. polski emigrant, major Bieniowski, zbudował w Londynie maszynę opartą na sztuce drukarskiej, nazwaną frenotypią</h3>
 <p class="fb-b">Władał 18 językami. Napisał też dzieło wydane w Londynie w 1854 r. (tytuł: „Improvement of Painting Invented and Patented”).</p>
 <p class="fb-r">potem → <a href="#fb-ma-rav">Ravizza</a></p>
 </article>
-<article id="fb-ma-rav" class="fb-c"><p class="fb-m">Wynalazek · 49:29-50:46</p>
+<article id="fb-ma-rav" class="fb-c"><p class="fb-m">Wynalazek</p>
 <h3>Giuseppe Ravizza zbudował „klawikord do pisania” i w 1855 r. dostał prawo wyłączne na 15 lat</h3>
 <p class="fb-b">18 lat pracy. Dążył do pisma widocznego (wcześniej piszący nie widział tekstu). Pierwszy zastosował klawisze w rzędach, cofacz i taśmę barwiącą.</p>
 <p class="fb-r">potem → <a href="#fb-ma-hans">Pisząca kula</a></p>
 </article>
-<article id="fb-ma-hans" class="fb-c"><p class="fb-m">Ciekawostka · 50:46-51:48</p>
+<article id="fb-ma-hans" class="fb-c"><p class="fb-m">Ciekawostka</p>
 <h3>W 1867 r. duński pastor Rasmus Malling-Hansen zlecił produkcję „piszącej kuli” z 52 klawiszami, niewygodnej w użyciu</h3>
 <p class="fb-b">Nietzsche dostał taką maszynę od siostry na gwiazdkę, szybko się zniechęcił i nigdy do niej nie wrócił.</p>
 </article>
-<article id="fb-ma-sholes" class="fb-c"><p class="fb-m">Przełom · 51:48-52:38</p>
+<article id="fb-ma-sholes" class="fb-c"><p class="fb-m">Przełom</p>
 <h3>Pierwszą seryjnie produkowaną i powszechną maszyną była maszyna Remingtona (Typograf), wynalazek Christophera Latham Sholesa</h3>
 <p class="fb-b">Sholes, drukarz i urzędnik celny, z drukarzem Samuelem Soule pracował nad maszyną do numerowania stron. Mechanik Carlos Glidden z Milwaukee podsunął zastąpienie cyfr literami.</p>
 <p class="fb-r">potem → <a href="#fb-ma-histor">Droga do produkcji</a></p>
 </article>
-<article id="fb-ma-histor" class="fb-c"><p class="fb-m">Historia · 52:38-53:59</p>
+<article id="fb-ma-histor" class="fb-c"><p class="fb-m">Historia</p>
 <h3>Wczesna maszyna Sholesa pisała tylko dużymi literami i zawodowi pisarze ją odrzucili</h3>
 <p class="fb-b">Soule i Glidden zrezygnowali ze spółki. Sholes założył nową z zegarmistrzem Yostem i inżynierem Jamesem Densmore&#x27;em, który finansował. Brak środków: sprzedał model fabryce karabinów Remington &amp; Son, która ruszyła z masową produkcją.</p>
 <p class="fb-r">potem → <a href="#fb-ma-qwerty">QWERTY</a></p>
 </article>
-<article id="fb-ma-qwerty" class="fb-c"><p class="fb-m">Układ klawiatury · 53:59-54:41</p>
+<article id="fb-ma-qwerty" class="fb-c"><p class="fb-m">Układ klawiatury</p>
 <h3>Układ klawiszy QWERTY rozwiązał problem zakleszczania się czcionek</h3>
 <p class="fb-b">Wcześniej klawisze układano alfabetycznie w czterech rzędach i zbyt szybkie pisanie je zakleszczało. W QWERTY litery, które w angielskim często występują po sobie, leżą daleko od siebie.</p>
 <p class="fb-r">potem → <a href="#fb-ma-widoczne">Pismo widoczne</a></p>
 </article>
-<article id="fb-ma-widoczne" class="fb-c"><p class="fb-m">Ulepszenie · 54:41-55:15, 56:43-57:16</p>
+<article id="fb-ma-widoczne" class="fb-c"><p class="fb-m">Ulepszenie</p>
 <h3>Maszyna Sholesa nie pozwalała widzieć tekstu; pismo widoczne wprowadzono w 1890 r.</h3>
 <p class="fb-b">Rozwiązanie: odwrócenie wałka z kartką. Prawa do patentu kupiła firma Underwood i po pięciu latach zaczęła produkcję (1896: pierwsza Underwood z pismem widocznym).</p>
 <p class="fb-r">potem → <a href="#fb-ma-jost">Kaligraf Yosta</a></p>
 </article>
-<article id="fb-ma-jost" class="fb-c"><p class="fb-m">Konkurencja · 55:15-56:21</p>
+<article id="fb-ma-jost" class="fb-c"><p class="fb-m">Konkurencja</p>
 <h3>Yost zbudował maszynę z pełną klawiaturą, Kaligraf (1879), a Remington jej nie przyjął</h3>
 <p class="fb-b">Maszyny z pełną klawiaturą weszły na rynek w 1888 r. W tym roku Smith Premier ruszył z produkcją wg pomysłu Alexandra Timothy Browna z Syracuse.</p>
 <p class="fb-r">potem → <a href="#fb-ma-dens">Densmore</a></p>
 </article>
-<article id="fb-ma-dens" class="fb-c"><p class="fb-m">Ulepszenie · 56:21-56:43</p>
+<article id="fb-ma-dens" class="fb-c"><p class="fb-m">Ulepszenie</p>
 <h3>Densmore opatentował ulepszenie: prowadnice na łożyskach kulkowych</h3>
 <p class="fb-r">potem → <a href="#fb-ma-barlock">Barlock</a></p>
 </article>
-<article id="fb-ma-barlock" class="fb-c"><p class="fb-m">Przełom · 57:16-57:27</p>
+<article id="fb-ma-barlock" class="fb-c"><p class="fb-m">Przełom</p>
 <h3>Maszyna typu Barlock z pismem widocznym stała się podstawowym modelem produkcji</h3>
 <p class="fb-r">potem → <a href="#fb-ma-elek">Maszyna elektryczna</a></p>
 </article>
-<article id="fb-ma-elek" class="fb-c"><p class="fb-m">Przełom · 60:27-61:14</p>
+<article id="fb-ma-elek" class="fb-c"><p class="fb-m">Przełom</p>
 <h3>W 1902 r. powstała całkowicie elektryczna maszyna do pisania: Blickensderfer Electric</h3>
 <p class="fb-b">Wcześniejsze wymagały mocnego, mechanicznego uderzenia w klawisze. Wynalazca: George Canfield Blickensderfer.</p>
 </article>
-<article id="fb-ma-pl" class="fb-c"><p class="fb-m">Polska · 57:27-59:17</p>
+<article id="fb-ma-pl" class="fb-c"><p class="fb-m">Polska</p>
 <h3>W Polsce maszyny do pisania produkowano od 1924 r.: Idea, Iskra, Orzeł, FK, a w latach 1970-1990 Predom Łucznik</h3>
 <p class="fb-b">Bydgoszcz: Władysław Paciorkiewicz („Idea”, 1924), po nim Edmund Krzesiński („Iskra”, 1927). Poznań: „Orzeł” (kopia niemieckiej Adler). Państwowe zakłady uzbrojenia: „FK”. Radom: Predom, Predom Łucznik, Łucznik (też walizkowe i ciężkie do hal maszyn). Slajd: Predom Łucznik 1001 (1976) i Łucznik 1301 (1982), obie z barlockiem.</p>
 </article>
-<article id="fb-ma-mech" class="fb-c"><p class="fb-m">Jak działa · 59:17-60:27</p>
+<article id="fb-ma-mech" class="fb-c"><p class="fb-m">Jak działa</p>
 <h3>W maszynie z barlockiem wałek przesuwa się o jeden znak po każdym uderzeniu, a ramię po lewej przesuwa go o linijkę i z powrotem do początku</h3>
 <p class="fb-b">Piszący zaczyna od lewej strony.</p>
 </article>
 </section>
 <section id="fb-z-kody"><h2>11. Kody i sygnały<small>77:38-84:51</small></h2>
-<article id="fb-ko-kody" class="fb-c"><p class="fb-m">Kody · 77:44-78:31</p>
+<article id="fb-ko-kody" class="fb-c"><p class="fb-m">Kody</p>
 <h3>Wraz z rozwojem języków powstały kody: szyfry ukrywają informacje, a kody Morse&#x27;a i Baudota usprawniają komunikację na odległość</h3>
 <p class="fb-b">Kody typu Morse&#x27;a lub Baudota zmniejszają liczbę znaków, które trzeba przesłać.</p>
 <p class="fb-r">szczególny rodzaj → <a href="#fb-ko-conlang">Sztuczne języki</a></p>
 </article>
-<article id="fb-ko-conlang" class="fb-c"><p class="fb-m">Kody · 78:31-78:52</p>
+<article id="fb-ko-conlang" class="fb-c"><p class="fb-m">Kody</p>
 <h3>Sztuczne języki, czyli conlangi (constructed language), stworzyła od podstaw grupa ludzi, nie ewolucja</h3>
 <p class="fb-r">trzy grupy → <a href="#fb-ko-con1">Trzy grupy conlangów</a></p>
 </article>
-<article id="fb-ko-con1" class="fb-c"><p class="fb-m">Podział · 78:52-79:38</p>
+<article id="fb-ko-con1" class="fb-c"><p class="fb-m">Podział</p>
 <h3>Sztuczne języki dzielą się na trzy grupy: międzynarodowe, artystyczne i naukowe</h3>
 <p class="fb-b">Do komunikacji międzynarodowej: esperanto. Artystyczne i estetyczne: klingoński, elficki Tolkiena. Naukowe i filozoficzne: loglan.</p>
 </article>
-<article id="fb-ko-sygn" class="fb-c"><p class="fb-m">Sygnały · 79:38-79:47</p>
+<article id="fb-ko-sygn" class="fb-c"><p class="fb-m">Sygnały</p>
 <h3>Symbole przekazywane na odległość opierały się na urządzeniach ułatwiających zmysłom wychwycenie sygnału</h3>
 <p class="fb-r">rodzaj → <a href="#fb-ko-dym">Dym i ogień</a></p>
 </article>
-<article id="fb-ko-dym" class="fb-c"><p class="fb-m">Sygnał optyczny · 79:47-80:35</p>
+<article id="fb-ko-dym" class="fb-c"><p class="fb-m">Sygnał optyczny</p>
 <h3>Sygnały dymne i ogniowe (optyczny telegraf) zależały od pogody</h3>
 <p class="fb-b">Ognisko przykrywano koszem lub matą i odsłaniano w odstępach: smugi dymu w dzień, migotanie nocą. Wiatr i opady utrudniały skomplikowane kody. Stosowali je m.in. Indianie Ameryki Północnej.</p>
 <p class="fb-r">rozwiązanie → <a href="#fb-ko-zasieg">Stacje przekaźnikowe</a></p>
 </article>
-<article id="fb-ko-zasieg" class="fb-c"><p class="fb-m">Rozwiązanie · 80:35-81:34</p>
+<article id="fb-ko-zasieg" class="fb-c"><p class="fb-m">Rozwiązanie</p>
 <h3>Zasięg ograniczał zasięg zmysłów, więc stosowano stacje przekaźnikowe powtarzające sygnał</h3>
 <p class="fb-b">Ogniska na wzgórzach i górach (cywilizacje osiadłe) oraz wieże sygnałowe, np. Chiny na Wielkim Murze. Latarnie morskie to specyficzny rodzaj wież sygnałowych.</p>
 </article>
-<article id="fb-ko-wojna" class="fb-o"><p class="fb-m">Uwaga wykładowcy · 81:34-81:57</p>
+<article id="fb-ko-wojna" class="fb-o"><p class="fb-m">Uwaga wykładowcy</p>
 <h3>Warto zwrócić uwagę, że wojna często była motorem napędzającym badania w technikach komunikacyjnych</h3>
 <p class="fb-b">W bitwach lądowych kody oparte na proporcjach i symbolach stosowano tysiące lat przed naszą erą.</p>
 </article>
-<article id="fb-ko-helio" class="fb-c"><p class="fb-m">Heliograf · 81:57-82:31</p>
+<article id="fb-ko-helio" class="fb-c"><p class="fb-m">Heliograf</p>
 <h3>Heliograf odbija promienie światła lustrami; pierwsze datuje się na 400 r. p.n.e.</h3>
 <p class="fb-b">Opis użycia jest w „Helenice” Ksenofonta: sygnały bitewne przesyłane wypolerowanymi tarczami.</p>
 <p class="fb-r">zaawansowany wariant → <a href="#fb-ko-semaf">Semafor</a></p>
 </article>
-<article id="fb-ko-semaf" class="fb-c"><p class="fb-m">Semafor · 82:31-83:34</p>
+<article id="fb-ko-semaf" class="fb-c"><p class="fb-m">Semafor</p>
 <h3>Semafor to najbardziej zaawansowany optyczny telegraf, wynaleziony przez braci Chappe pod koniec XVIII w.</h3>
 <p class="fb-b">Wykazali, że z dużej odległości łatwiej dostrzec położenie pręta niż kolor. Pierwszy semafor miał 196 pozycji. Linia Paryż-Lille (1792): 36 znaków na 192 km w 32 minuty. Wariantem semafora są morskie flagi komunikacyjne.</p>
 </article>
-<article id="fb-ko-dzwiek" class="fb-c"><p class="fb-m">Sygnał dźwiękowy · 83:34-84:33</p>
+<article id="fb-ko-dzwiek" class="fb-c"><p class="fb-m">Sygnał dźwiękowy</p>
 <h3>Kultury z dużymi drzewami używały wydrążonych pni, czyli bębnów; najbardziej znane są tamtamy zachodniej Afryki</h3>
 <p class="fb-b">Wynalazek powstał niezależnie w wielu kulturach afrykańskich i amerykańskich. Dziś głównie w muzyce. Stosowano też stacje przekaźnikowe; rogi i bębny służyły na polach bitew.</p>
 <p class="fb-r">w budynkach → <a href="#fb-ko-rury">Systemy rur</a></p>
 </article>
-<article id="fb-ko-rury" class="fb-c"><p class="fb-m">Sygnał dźwiękowy · 84:33-84:51</p>
+<article id="fb-ko-rury" class="fb-c"><p class="fb-m">Sygnał dźwiękowy</p>
 <h3>Na małą odległość w budowlach dźwięk przekazywano systemami rur; najstarszy to wynalazek Chińczyka z 968 r.</h3>
 <p class="fb-b">Prowadzący podał imię jako „Kungfo Wing Link”.</p>
 </article>
 </section>
 <section id="fb-z-poczta"><h2>12. Kurierzy i poczta<small>84:51-89:29</small></h2>
-<article id="fb-po-pismo" class="fb-c"><p class="fb-m">Pismo · 84:51-85:08</p>
+<article id="fb-po-pismo" class="fb-c"><p class="fb-m">Pismo</p>
 <h3>Pismo umożliwiło przesyłanie wiadomości na dalsze odległości</h3>
 <p class="fb-b">Pomogły coraz praktyczniejsze materiały piśmiennicze: od tabliczek glinianych przez zwoje papirusowe po papier.</p>
 <p class="fb-r">umożliwiło → <a href="#fb-po-kur">Kurierzy</a></p>
 </article>
-<article id="fb-po-kur" class="fb-c"><p class="fb-m">Kurierzy · 85:08-85:32</p>
+<article id="fb-po-kur" class="fb-c"><p class="fb-m">Kurierzy</p>
 <h3>Kurierzy pojawili się wkrótce po wynalezieniu pisma; najstarsze informacje o systemie kurierskim są z Egiptu z 2400 r. p.n.e.</h3>
 <p class="fb-r">dał początek → <a href="#fb-po-pocz">Początek poczty</a></p>
 </article>
-<article id="fb-po-pocz" class="fb-c"><p class="fb-m">Poczta · 85:32-86:11</p>
+<article id="fb-po-pocz" class="fb-c"><p class="fb-m">Poczta</p>
 <h3>Rozwój kurierów dał początek poczcie; palma pierwszeństwa należy się Asyrii (550-500 p.n.e.)</h3>
 <p class="fb-b">Nieliczne przesłanki wskazują system pocztowy nawet w 1700 r. p.n.e., za Hammurabiego. Asyryjski system był dodatkiem do systemu zbierania informacji: szpiegowskiego i podatkowego.</p>
 <p class="fb-r">przykład → <a href="#fb-po-chiny">Poczta chińska</a> · przykład → <a href="#fb-po-rzym">Cursus Publicus</a></p>
 </article>
-<article id="fb-po-chiny" class="fb-c"><p class="fb-m">Przykład · 86:11-86:52</p>
+<article id="fb-po-chiny" class="fb-c"><p class="fb-m">Przykład</p>
 <h3>Chińska poczta jest najstarszym wciąż działającym systemem i wywodzi się z reform dynastii Qin (227-221 p.n.e.)</h3>
 <p class="fb-b">Zalążki były starsze (ok. 550 p.n.e.): ktoś mówił wtedy, że plotki podróżują szybciej niż poczta, więc poczta już istniała.</p>
 </article>
-<article id="fb-po-rzym" class="fb-c"><p class="fb-m">Przykład · 86:52-87:23</p>
+<article id="fb-po-rzym" class="fb-c"><p class="fb-m">Przykład</p>
 <h3>Poczta rzymska to jedna z najlepiej udokumentowanych w starożytności: Cursus Publicus za Oktawiana Augusta</h3>
 <p class="fb-b">Początkowo dla służb rządowych, wkrótce także dla obywateli rzymskich.</p>
 </article>
-<article id="fb-po-sredn" class="fb-c"><p class="fb-m">Przykład · 87:23-87:46</p>
+<article id="fb-po-sredn" class="fb-c"><p class="fb-m">Przykład</p>
 <h3>Systemy pocztowe istniały u króla wielkiego, Zakonu Krzyżackiego i w wielu państwach średniowiecznych</h3>
 <p class="fb-b">W Rzeczypospolitej Obojga Narodów wielu szlachciców miało własnych kurierów-listonoszy, a niepiśmienni korzystali ze skryby, który pisał i czytał listy.</p>
 <p class="fb-r">potem → <a href="#fb-po-upu">Związek Pocztowy</a></p>
 </article>
-<article id="fb-po-upu" class="fb-c"><p class="fb-m">Organizacja · 87:46-88:01</p>
+<article id="fb-po-upu" class="fb-c"><p class="fb-m">Organizacja</p>
 <h3>W 1874 r. powstał Międzynarodowy Związek Pocztowy, najstarsza organizacja międzynarodowa</h3>
 </article>
-<article id="fb-po-srodki" class="fb-c"><p class="fb-m">Środki · 88:01-88:19</p>
+<article id="fb-po-srodki" class="fb-c"><p class="fb-m">Środki</p>
 <h3>Poczta podróżowała gołębiami, kurierami konnymi, psimi zaprzęgami, balonami, statkami, łodziami podwodnymi, koleją, samochodami i samolotami</h3>
 <p class="fb-r">szybkość → <a href="#fb-po-szyb">Szybkość przesyłek</a></p>
 </article>
-<article id="fb-po-szyb" class="fb-o"><p class="fb-m">Uwaga wykładowcy · 88:19-89:29</p>
+<article id="fb-po-szyb" class="fb-o"><p class="fb-m">Uwaga wykładowcy</p>
 <h3>Warto zwrócić uwagę na szybkość dostarczania przesyłek pocztowych</h3>
 <p class="fb-b">Najstarsze systemy: konie i wielbłądy, rzadko ponad 20 km/h. Od 1600 r. rydwany do 30 km/h. Pierwsze regularne dyliżanse w Wielkiej Brytanii (1784): do 15 km/h. XIX-wieczne lokomotywy i parowce: rzadko 20 km/h. XX w.: pociągi powyżej 100 km/h, samoloty przebijają barierę dźwięku, od lat 60. człowiek pokonuje wiele km na sekundę.</p>
 </article>
 </section>
 <section id="fb-z-tel"><h2>13. Telegraf i telefon<small>89:29-97:51</small></h2>
-<article id="fb-te-elek" class="fb-c"><p class="fb-m">Elektryczność · 89:29-89:46</p>
+<article id="fb-te-elek" class="fb-c"><p class="fb-m">Elektryczność</p>
 <h3>Wynalazek elektryczności otworzył nową erę: komunikację niemal natychmiastową, z prędkością światła</h3>
 <p class="fb-r">pierwszy wynalazek → <a href="#fb-te-tel">Telegraf</a></p>
 </article>
-<article id="fb-te-tel" class="fb-c"><p class="fb-m">Telegraf · 89:46-90:00</p>
+<article id="fb-te-tel" class="fb-c"><p class="fb-m">Telegraf</p>
 <h3>Pierwszy elektryczny wynalazek komunikacyjny, telegraf, zastosował w 1838 r. w Anglii sir Charles Wheatstone</h3>
 <p class="fb-r">potem → <a href="#fb-te-morse">Kod Morse&#x27;a</a> · skutek → <a href="#fb-te-gaz">Gazety</a></p>
 </article>
-<article id="fb-te-morse" class="fb-c"><p class="fb-m">Kod · 90:00-90:39</p>
+<article id="fb-te-morse" class="fb-c"><p class="fb-m">Kod</p>
 <h3>Telegraf miał niską przepustowość danych, więc powstał kod Morse&#x27;a, by ją zwiększyć</h3>
 <p class="fb-b">Prowadzący: to „nowy tamtam”, ale w swoim czasie wspaniałe urządzenie zmieniające losy świata. Slajd: budowa telegrafu z kodem Morse&#x27;a.</p>
 </article>
-<article id="fb-te-gaz" class="fb-c"><p class="fb-m">Skutek · 90:39-90:48</p>
+<article id="fb-te-gaz" class="fb-c"><p class="fb-m">Skutek</p>
 <h3>Telegraf pobudził rozwój gazet: wiadomości sprzed kilkunastu godzin zamiast sprzed kilku dni</h3>
 </article>
-<article id="fb-te-kabel" class="fb-c"><p class="fb-m">Skutek · 90:48-91:03</p>
+<article id="fb-te-kabel" class="fb-c"><p class="fb-m">Skutek</p>
 <h3>Pierwsze kable podmorskie skróciły czas przekazu przez oceany z tygodni lub miesięcy, a pojawiło się określenie „globalna wioska”</h3>
 </article>
-<article id="fb-te-prawn" class="fb-c"><p class="fb-m">Skutek · 91:03-91:08</p>
+<article id="fb-te-prawn" class="fb-c"><p class="fb-m">Skutek</p>
 <h3>Telegramy uznawano za dokumenty prawnie wiążące w transakcjach handlowych</h3>
 </article>
-<article id="fb-te-teleks" class="fb-o"><p class="fb-m">Uwaga wykładowcy · 91:08-91:44</p>
+<article id="fb-te-teleks" class="fb-o"><p class="fb-m">Uwaga wykładowcy</p>
 <h3>Warto zauważyć, że telegraf w zaawansowanej postaci (teleks) działał w krajach rozwiniętych do drugiej połowy XX w., a w wielu krajach działa do dziś</h3>
 <p class="fb-b">Np. w Teksasie w USA do drugiej połowy XX w.; do dziś na Kubie i w Pakistanie. Dziś funkcję telegrafu przejął internet i e-mail.</p>
 <p class="fb-r">innym środkiem → <a href="#fb-tf-bell">Telefon Bella</a></p>
 </article>
-<article id="fb-tf-bell" class="fb-c"><p class="fb-m">Telefon · 91:44-92:59</p>
+<article id="fb-tf-bell" class="fb-c"><p class="fb-m">Telefon</p>
 <h3>Aleksander Graham Bell opatentował telefon, w którym mikrofon i odbiornik są identyczne</h3>
 <p class="fb-b">Magnes otoczony solenoidem blisko żelaznej membrany. Drgania membrany indukują prądy w solenoidzie, płyną one impulsowo kablem, a w odbiorniku zachodzi działanie odwrotne i odtwarzana jest wiadomość głosowa.</p>
 <p class="fb-r">spór o wynalazcę → <a href="#fb-tf-meucci">Spór: Bell czy Meucci</a> · bezprzewodowo → <a href="#fb-tf-tesla">Tesla i bezprzewodowo</a></p>
 </article>
-<article id="fb-tf-meucci" class="fb-o"><p class="fb-m">Uwaga wykładowcy: wynalazca · 92:59-94:27</p>
+<article id="fb-tf-meucci" class="fb-o"><p class="fb-m">Uwaga wykładowcy: wynalazca</p>
 <h3>Telefon skonstruował w 1848 r. Antonio Meucci; Bell go spopularyzował i opatentował z ulepszeniami</h3>
 <p class="fb-b">Prowadzący postawił na slajdzie pytajnik. W latach 70. XIX w. Bell, błędnie uznawany za wynalazcę, ulepszył projekty Meucciego. Meucci wytoczył proces o plagiat, przerwany jego śmiercią w 1896 r. Prawdziwsze jest stwierdzenie, że Bell wynalazł nie telefon, lecz firmę telekomunikacyjną.</p>
 </article>
-<article id="fb-tf-tesla" class="fb-c"><p class="fb-m">Telefonia bezprzewodowa · 94:27-94:48</p>
+<article id="fb-tf-tesla" class="fb-c"><p class="fb-m">Telefonia bezprzewodowa</p>
 <h3>Prekursorem telefonii bezprzewodowej były wynalazki Mikołaja Tesli z końca XIX w.</h3>
 <p class="fb-r">potem → <a href="#fb-tf-przen">Pierwsze przenośne</a></p>
 </article>
-<article id="fb-tf-przen" class="fb-c"><p class="fb-m">Telefon komórkowy · 94:49-95:21</p>
+<article id="fb-tf-przen" class="fb-c"><p class="fb-m">Telefon komórkowy</p>
 <h3>Pierwsze przenośne aparaty telefoniczne wojsko i policja zaczęły stosować w latach 50. XX w. w USA i Szwecji</h3>
 <p class="fb-b">Od lat 90. przenośne bezprzewodowe telefony komórkowe stają się niemal podstawowym wyposażeniem każdego człowieka.</p>
 <p class="fb-r">potem → <a href="#fb-tf-sms">Od głosu do komputera</a></p>
 </article>
-<article id="fb-tf-sms" class="fb-c"><p class="fb-m">Telefon komórkowy · 95:21-96:05</p>
+<article id="fb-tf-sms" class="fb-c"><p class="fb-m">Telefon komórkowy</p>
 <h3>Telefony komórkowe służyły najpierw do rozmów, potem doszły SMS-y, a dziś także rozmowy z obrazem i funkcje komputera</h3>
 <p class="fb-b">Łącznie z internetem oraz wysyłaniem i odbieraniem maili.</p>
 </article>
-<article id="fb-tf-fax" class="fb-c"><p class="fb-m">Fax · 96:05-97:00</p>
+<article id="fb-tf-fax" class="fb-c"><p class="fb-m">Fax</p>
 <h3>Fax oparty na wynalazku Rudolfa Hella z 1929 r. był popularnym dodatkiem do telefonu, ze szczytem w latach 80. XX w.</h3>
 <p class="fb-b">Wraz ze spadkiem cen rosła popularność, ale krótko: internet i e-mail przejęły przesyłanie plików graficznych.</p>
 <p class="fb-r">potem → <a href="#fb-tf-pc">Komputer zastępuje telefon</a></p>
 </article>
-<article id="fb-tf-pc" class="fb-c"><p class="fb-m">Skutek · 97:00-97:51</p>
+<article id="fb-tf-pc" class="fb-c"><p class="fb-m">Skutek</p>
 <h3>Od lat 90. komputery osobiste przejmują funkcje telefonu, faksu i automatycznej sekretarki</h3>
 <p class="fb-b">Darmowe programy (WhatsApp, Skype, Messenger; „nie wiem, czy ktoś jeszcze w ogóle Skype&#x27;a używa”) dorównują jakością rozmów. „The Economist” prognozuje, że to wyrok śmierci dla wynalazku Bella.</p>
 </article>
 </section>
 <section id="fb-z-radio"><h2>14. Radio, telewizja, komputer<small>97:51-105:13</small></h2>
-<article id="fb-ra-maxwell" class="fb-c"><p class="fb-m">Radio · 97:51-98:23</p>
+<article id="fb-ra-maxwell" class="fb-c"><p class="fb-m">Radio</p>
 <h3>Teorie prowadzące do radia stworzył James Maxwell (fale elektromagnetyczne, 1873)</h3>
 <p class="fb-b">Eksperymenty Heinricha Hertza (1886-1888) utorowały drogę wynalazcom radia.</p>
 <p class="fb-r">potem → <a href="#fb-ra-marconi">Marconi i Tesla</a></p>
 </article>
-<article id="fb-ra-marconi" class="fb-c"><p class="fb-m">Radio · 98:23-98:58</p>
+<article id="fb-ra-marconi" class="fb-c"><p class="fb-m">Radio</p>
 <h3>Pierwszy patent na radio dostał Guglielmo Marconi (Wielka Brytania, 1896), a Tesla stracił swój z USA w 1907</h3>
 <p class="fb-b">Tesla dostał patent w USA rok po Marconim, ale w 1907 r. stracił go na jego rzecz. Patent przywrócono mu po śmierci.</p>
 <p class="fb-r">potem → <a href="#fb-ra-first">Pierwsze audycje</a></p>
 </article>
-<article id="fb-ra-first" class="fb-c"><p class="fb-m">Radio · 98:58-99:32</p>
+<article id="fb-ra-first" class="fb-c"><p class="fb-m">Radio</p>
 <h3>Pierwsza transmisja radiowa to 1906 r. (Reginald Fessenden, kolęda „Cicha noc”, Brant Rock, USA)</h3>
 <p class="fb-b">Pierwsza transmisja wiadomości: 1920 r., stacja 8MK (USA). Regularne audycje rozrywkowe: od 1922 r.</p>
 <p class="fb-r">potem → <a href="#fb-ra-tranz">Tranzystor i Telstar</a></p>
 </article>
-<article id="fb-ra-tranz" class="fb-c"><p class="fb-m">Radio · 99:32-100:27</p>
+<article id="fb-ra-tranz" class="fb-c"><p class="fb-m">Radio</p>
 <h3>Tranzystor (lata 60.) dał pierwsze przenośne odbiorniki, a satelita Telstar (1963) był pierwszym komunikacyjnym</h3>
 <p class="fb-b">Od lat 90. komputery osobiste odbierają i odtwarzają fale radiowe. Fale radiowe służą też do lokalizacji; radar jest logicznym rozwinięciem radia.</p>
 </article>
-<article id="fb-tv-nipkow" class="fb-c"><p class="fb-m">Telewizja · 102:20-102:37</p>
+<article id="fb-tv-nipkow" class="fb-c"><p class="fb-m">Telewizja</p>
 <h3>Paul Nipkow opatentował w 1884 r. pierwszy elektromechaniczny system przesyłania obrazu</h3>
 <p class="fb-r">potem → <a href="#fb-tv-hist">Pierwsze transmisje TV</a></p>
 </article>
-<article id="fb-tv-hist" class="fb-c"><p class="fb-m">Telewizja · 102:37-103:28</p>
+<article id="fb-tv-hist" class="fb-c"><p class="fb-m">Telewizja</p>
 <h3>Pierwsza publiczna transmisja telewizji: Nowy Jork 1927; rozrywkowa: Wielka Brytania 1930; międzykontynentalna na żywo: USA 1957</h3>
 <p class="fb-b">W tym dziesięcioleciu telewizja zmieniała się z czarno-białej w kolorową. Ciekawostka: w 1980 r., niespełna wiek po patencie Nipkowa, 98% rodzin w USA miało odbiornik.</p>
 <p class="fb-r">potem → <a href="#fb-tv-wideo">Wideotekst i Minitel</a></p>
 </article>
-<article id="fb-tv-wideo" class="fb-c"><p class="fb-m">Telewizja · 103:28-104:14</p>
+<article id="fb-tv-wideo" class="fb-c"><p class="fb-m">Telewizja</p>
 <h3>Od lat 60. telewizja z telefonem i komputerem oferowała wideotekst; najbardziej znany jest francuski Minitel z lat 80.</h3>
 <p class="fb-b">Telewizor wyświetlał interaktywne menu, a telefon służył do nawigacji. Minitel miał własny terminal z modemem. Pochodna: teletekst (telewizor i pilot).</p>
 </article>
-<article id="fb-co-komp" class="fb-c"><p class="fb-m">Komputer · 100:27-100:47</p>
+<article id="fb-co-komp" class="fb-c"><p class="fb-m">Komputer</p>
 <h3>Pod koniec XIX w. słowo „komputer” oznaczało mechaniczne urządzenia ułatwiające liczenie; w Oxford Dictionary jest od 1897 r.</h3>
 <p class="fb-r">pierwsze komputery → <a href="#fb-co-ogr">Pierwsze komputery</a></p>
 </article>
-<article id="fb-co-ogr" class="fb-c"><p class="fb-m">Komputer · 100:47-101:02</p>
+<article id="fb-co-ogr" class="fb-c"><p class="fb-m">Komputer</p>
 <h3>Pierwsze komputery wykonywały tylko nieliczne konkretne operacje, do jakich zaprojektowano je od podstaw</h3>
 <p class="fb-r">przełom → <a href="#fb-co-zuse">Zuse Z3</a></p>
 </article>
-<article id="fb-co-zuse" class="fb-c"><p class="fb-m">Komputer · 101:02-101:26</p>
+<article id="fb-co-zuse" class="fb-c"><p class="fb-m">Komputer</p>
 <h3>W 1941 r. Konrad Zuse zbudował Z3, pierwszy kompletny komputer w sensie teoremu Turinga: wykonuje każde zaprogramowane zadanie</h3>
 <p class="fb-r">potem → <a href="#fb-co-wplyw">Komputer a komunikacja</a></p>
 </article>
-<article id="fb-co-wplyw" class="fb-c"><p class="fb-m">Komputer · 101:26-102:20</p>
+<article id="fb-co-wplyw" class="fb-c"><p class="fb-m">Komputer</p>
 <h3>Komputery przyspieszyły postęp naukowy, ale ich nośniki (karty perforowane, taśmy magnetyczne, wydruki) długo nie miały znaczenia dla komunikacji międzyludzkiej</h3>
 <p class="fb-b">Znaczenie komputerów dla komunikacji gwałtownie wzrosło w drugiej połowie XX w. z sieciami komputerowymi. O tym na kolejnym wykładzie.</p>
 <p class="fb-r">potem → <a href="#fb-co-net">Komputer i internet</a></p>
 </article>
-<article id="fb-co-net" class="fb-c"><p class="fb-m">Internet · 104:14-104:27</p>
+<article id="fb-co-net" class="fb-c"><p class="fb-m">Internet</p>
 <h3>Od lat 90. komputery osobiste odtwarzają dźwięk i ruchome obrazy oraz przesyłają je przez internet</h3>
 <p class="fb-r">dokąd dalej → <a href="#fb-co-przysz">Przyszłość komunikacji</a></p>
 </article>
-<article id="fb-co-przysz" class="fb-c"><p class="fb-m">Przyszłość · 104:27-105:23</p>
+<article id="fb-co-przysz" class="fb-c"><p class="fb-m">Przyszłość</p>
 <h3>Przyszłości komunikacji nie sposób przewidzieć; są już telefony w postaci zwijanej folii i pierwsze rozmowy przez hologramy</h3>
 <p class="fb-b">Prowadzący zakończył pierwszy wykład pytaniem, czy są pytania, i przeszedł do wykładu numer dwa.</p>
 </article>
@@ -889,242 +902,242 @@ html.js-ok body.list { overflow:auto; height:auto; }
 </article>
 </section>
 <section id="fb-z-info"><h2>16. Informatyka i liczydła<small>105:13-111:46</small></h2>
-<article id="fb-in-przej" class="fb-c"><p class="fb-m">Przejście · 105:23-106:19</p>
+<article id="fb-in-przej" class="fb-c"><p class="fb-m">Przejście</p>
 <h3>Drugi wykład dotyczy komputerów, a szerzej informatyki: od abakusa do sztucznej inteligencji</h3>
 <p class="fb-b">Obiecany wcześniej wykład o komputerach.</p>
 <p class="fb-r">czym jest → <a href="#fb-in-def">Czym jest informatyka</a></p>
 </article>
-<article id="fb-in-def" class="fb-c"><p class="fb-m">Definicja · 106:19-107:03</p>
+<article id="fb-in-def" class="fb-c"><p class="fb-m">Definicja</p>
 <h3>Informatyka to dziedzina związana z budową komputerów, ich oprogramowaniem i stosowaniem</h3>
 <p class="fb-b">Według Wikipedii: dziedzina nauk ścisłych i techniki zajmująca się przetwarzaniem informacji, metodami jej przetwarzania i technologiami wytwarzania układów przetwarzających. W wielkim skrócie: sprzęt i oprogramowanie.</p>
 </article>
-<article id="fb-in-potrz" class="fb-c"><p class="fb-m">Przyczyna · 107:03-107:23</p>
+<article id="fb-in-potrz" class="fb-c"><p class="fb-m">Przyczyna</p>
 <h3>Od początku cywilizacji ludzie musieli liczyć, a jej rozwój wymuszał coraz trudniejsze obliczenia i ułatwianie sobie życia</h3>
 <p class="fb-r">pierwsza maszyna → <a href="#fb-in-abak">Abakus</a></p>
 </article>
-<article id="fb-in-abak" class="fb-c"><p class="fb-m">Abakus · 107:23-108:20</p>
+<article id="fb-in-abak" class="fb-c"><p class="fb-m">Abakus</p>
 <h3>Najstarszą maszyną liczącą było chińskie liczydło abakus, czyli suanpan</h3>
 <p class="fb-b">Zasada: przekładanie kamyków w rowkach. Użyteczność potwierdzono już w XXV w. p.n.e. Pierwsza wersja to tabliczka z rowkami, potem kuleczki na patyczkach (slajd).</p>
 <p class="fb-r">odmiana japońska → <a href="#fb-in-sor">Soroban</a></p>
 </article>
-<article id="fb-in-sor" class="fb-c"><p class="fb-m">Soroban · 108:20-109:10</p>
+<article id="fb-in-sor" class="fb-c"><p class="fb-m">Soroban</p>
 <h3>Japońska odmiana abakusa, soroban, jest używana do dziś, bo wprawny rachmistrz liczy na nim szybciej niż na kalkulatorze</h3>
 <p class="fb-b">W japońskich sklepach są przyrządy łączące elektroniczny kalkulator i soroban w jednej obudowie (slajd). Prowadzący: soroban liczy sobie 4000 lat.</p>
 </article>
-<article id="fb-in-mensa" class="fb-c"><p class="fb-m">Przyrząd · 109:10-109:54</p>
+<article id="fb-in-mensa" class="fb-c"><p class="fb-m">Przyrząd</p>
 <h3>W starożytnej Grecji i Rzymie używano stołu pitagorejskiego (mensa Pythagorea), z brązu, także do ułamków</h3>
 <p class="fb-b">Nazwa od Pitagorasa. Grecy i Rzymianie wierzyli, że Pitagoras wynalazł abakus, ale się mylili.</p>
 </article>
-<article id="fb-in-ogr" class="fb-c"><p class="fb-m">Ograniczenie · 109:54-110:16</p>
+<article id="fb-in-ogr" class="fb-c"><p class="fb-m">Ograniczenie</p>
 <h3>Na popularnych liczydłach łatwo dodawano i odejmowano, a mnożenie i dzielenie było uciążliwe</h3>
 <p class="fb-r">rozwiązanie → <a href="#fb-in-napier">Kości Napiera</a></p>
 </article>
-<article id="fb-in-napier" class="fb-c"><p class="fb-m">Kości Napiera · 110:16-110:50</p>
+<article id="fb-in-napier" class="fb-c"><p class="fb-m">Kości Napiera</p>
 <h3>Kości (pałeczki) Napiera z 1617 r. zrewolucjonizowały mnożenie i dzielenie</h3>
 <p class="fb-b">John Napier. Używano ich chętnie ok. 200 lat; odpowiednio ułożone kości pozwalały niemal natychmiast odczytać iloczyn nawet bardzo dużych liczb.</p>
 <p class="fb-r">podobny cel → <a href="#fb-in-suwak">Suwak logarytmiczny</a></p>
 </article>
-<article id="fb-in-suwak" class="fb-c"><p class="fb-m">Suwak · 110:50-111:46</p>
+<article id="fb-in-suwak" class="fb-c"><p class="fb-m">Suwak</p>
 <h3>Suwak logarytmiczny przyspieszał mnożenie i dzielenie dzięki logarytmom odkrytym przez Napiera</h3>
 <p class="fb-b">Liczby ustawiano na obudowie i centralnie przesuwanej linijce, a wynik odczytywano przesuwanym przezroczystym okienkiem z kreską. Wynalezienie (1633) przypisuje się Williamowi Oughtredowi („Atred”), a wcześniej podobną linijkę logarytmiczną wynalazł Edmund Gunter („Ginter”).</p>
 </article>
 </section>
 <section id="fb-z-kalk"><h2>17. Mechaniczne kalkulatory<small>111:46-117:43</small></h2>
-<article id="fb-kl-mech" class="fb-c"><p class="fb-m">Przyczyna · 111:46-112:10</p>
+<article id="fb-kl-mech" class="fb-c"><p class="fb-m">Przyczyna</p>
 <h3>Rozwój mechaniki w XVII w. i doskonalenie zegarmistrzostwa skłoniły do zmechanizowania obliczeń</h3>
 <p class="fb-b">Wcześniejsze przyrządy nie wymagały mechanicznego wspomagania.</p>
 <p class="fb-r">pierwszy → <a href="#fb-kl-schick">Kalkulator Schickarda</a></p>
 </article>
-<article id="fb-kl-schick" class="fb-c"><p class="fb-m">Kalkulator · 113:04-113:50</p>
+<article id="fb-kl-schick" class="fb-c"><p class="fb-m">Kalkulator</p>
 <h3>Wilhelm Schickard zbudował w 1623 r. pierwszy kalkulator mechaniczny na polecenie Jana Keplera</h3>
 <p class="fb-b">Niemiec: matematyk, konstruktor, pastor i profesor. Drewniana maszyna na kołach zębatych dodawała, odejmowała, mnożyła i dzieliła. Spłonęła w 1624 r. w wojnie trzydziestoletniej, a w 1960 r. zrekonstruował ją baron Bruno von Freytag.</p>
 <p class="fb-r">potem → <a href="#fb-kl-pasc">Pascalina</a></p>
 </article>
-<article id="fb-kl-pasc" class="fb-c"><p class="fb-m">Kalkulator · 112:10-113:04</p>
+<article id="fb-kl-pasc" class="fb-c"><p class="fb-m">Kalkulator</p>
 <h3>Pascalina (ok. 1645) Błażeja Pascala wykonywała bezbłędnie tylko dodawanie i odejmowanie</h3>
 <p class="fb-b">Francuski matematyk chciał usprawnić pracę ojca, poborcy podatkowego, który był jej pierwszym użytkownikiem. Inna nazwa: arytmometr.</p>
 <p class="fb-r">potem → <a href="#fb-kl-leib">Maszyna Leibniza</a></p>
 </article>
-<article id="fb-kl-leib" class="fb-c"><p class="fb-m">Kalkulator · 113:50-114:55</p>
+<article id="fb-kl-leib" class="fb-c"><p class="fb-m">Kalkulator</p>
 <h3>Gottfried Wilhelm Leibniz zaprojektował i wykonał w 1671 r. maszynę liczącą opartą na paskalinie i zegarze Schickarda</h3>
 <p class="fb-b">Odejmowała, mnożyła, dzieliła i wyznaczała pierwiastki kwadratowe. Nazywał ją „żywą ławą do obliczeń”.</p>
 <p class="fb-r">potem → <a href="#fb-kl-colmar">Arytmometr Colmara</a></p>
 </article>
-<article id="fb-kl-colmar" class="fb-c"><p class="fb-m">Kalkulator · 114:55-116:42</p>
+<article id="fb-kl-colmar" class="fb-c"><p class="fb-m">Kalkulator</p>
 <h3>Charles Xavier de Colmar zbudował arytmometr (projekt 1808-1812, budowa od 1820) i zdobył natychmiastowe uznanie</h3>
 <p class="fb-b">Prawdopodobnie dla firm ubezpieczeniowych. Za wynalazek został kawalerem Legii Honorowej. Do śmierci wynalazcy w 1870 r. zbudowano ok. 1000 sztuk: pierwszy masowo produkowany kalkulator mechaniczny na świecie, niedrogi i niezawodny (banki, ubezpieczyciele). Produkowano go do ok. 1914 r.</p>
 <p class="fb-r">potem → <a href="#fb-kl-odhner">Arytmometr Odhnera</a></p>
 </article>
-<article id="fb-kl-odhner" class="fb-c"><p class="fb-m">Kalkulator · 116:42-117:43</p>
+<article id="fb-kl-odhner" class="fb-c"><p class="fb-m">Kalkulator</p>
 <h3>Arytmometr Willgodta Odhnera (patent 1874) był masowo produkowany i używany jeszcze przez 100 lat</h3>
 <p class="fb-b">Używali go głównie księgowi i geodeci. Wymagał intensywnego kręcenia korbą, stąd nazwa „kręciołek” (slajd).</p>
 </article>
 </section>
 <section id="fb-z-karty"><h2>18. Karty perforowane i IBM<small>117:43-123:22</small></h2>
-<article id="fb-ka-zapis" class="fb-c"><p class="fb-m">Zapis danych · 117:43-118:10</p>
+<article id="fb-ka-zapis" class="fb-c"><p class="fb-m">Zapis danych</p>
 <h3>Urządzenia liczące liczyły, a dane zapisywano m.in. na kartach dziurkowanych</h3>
 <p class="fb-b">Wszystkie pokazane wcześniej przyrządy służyły do mechanicznego liczenia.</p>
 <p class="fb-r">zaczęło się od → <a href="#fb-ka-jac">Karty Jacquarda</a></p>
 </article>
-<article id="fb-ka-jac" class="fb-c"><p class="fb-m">Karty · 118:10-118:29</p>
+<article id="fb-ka-jac" class="fb-c"><p class="fb-m">Karty</p>
 <h3>Karty perforowane wynalazł Joseph Jacquard w 1805 r. do sterowania nićmi w krośnie</h3>
 <p class="fb-b">Pozwalały tkać tkaniny o powtarzalnym wzorze.</p>
 </article>
-<article id="fb-ka-holl" class="fb-c"><p class="fb-m">Hollerith · 118:29-119:09</p>
+<article id="fb-ka-holl" class="fb-c"><p class="fb-m">Hollerith</p>
 <h3>Herman Hollerith użył w 1890 r. karty perforowanej z własnym formatem do powszechnego spisu ludności w USA</h3>
 <p class="fb-b">Karta wielkości mniej więcej dolara; okrągłe dziurki oznaczały odpowiedzi twierdzące. Maszyny liczyły statystyki szybko i dokładnie, prawie bez udziału ludzi.</p>
 <p class="fb-r">skutek → <a href="#fb-ka-1887">Maszyna z 1887</a></p>
 </article>
-<article id="fb-ka-1887" class="fb-c"><p class="fb-m">Skutek · 119:09-119:32</p>
+<article id="fb-ka-1887" class="fb-c"><p class="fb-m">Skutek</p>
 <h3>W 1887 r. maszyna Hollerith w kilka dni wykonała statystykę umieralności, którą zespół rachmistrzów robiłby co najmniej trzy tygodnie</h3>
 </article>
-<article id="fb-ka-spis" class="fb-c"><p class="fb-m">Skutek · 119:32-120:07</p>
+<article id="fb-ka-spis" class="fb-c"><p class="fb-m">Skutek</p>
 <h3>Dzięki wynalazkowi opracowanie spisu z 1890 r. trwało trzy lata, a spis z 1880 r. po dziesięciu latach nie był jeszcze opracowany</h3>
 <p class="fb-b">Wzór karty opatentował 8 czerwca 1887 r. i stanął do konkursu rządu USA na opracowanie spisu na 1890 r.</p>
 <p class="fb-r">potem → <a href="#fb-ka-maszyna">Maszyna analityczna Hollerith</a></p>
 </article>
-<article id="fb-ka-maszyna" class="fb-c"><p class="fb-m">Hollerith · 120:07-120:23</p>
+<article id="fb-ka-maszyna" class="fb-c"><p class="fb-m">Hollerith</p>
 <h3>W 1894 r. Hollerith opatentował maszynę licząco-analityczną, a w 1896 r. założył firmę Tabulating Machine Company</h3>
 </article>
-<article id="fb-ka-nieprog" class="fb-c"><p class="fb-m">Wada · 120:23-120:43</p>
+<article id="fb-ka-nieprog" class="fb-c"><p class="fb-m">Wada</p>
 <h3>Maszyny licząco-analityczne nie były komputerami, bo nie dało się ich programować, więc do każdej czynności służyła inna maszyna</h3>
 <p class="fb-r">stąd → <a href="#fb-ka-urz">Maszyny do kart</a></p>
 </article>
-<article id="fb-ka-urz" class="fb-c"><p class="fb-m">Urządzenia · 120:43-122:36</p>
+<article id="fb-ka-urz" class="fb-c"><p class="fb-m">Urządzenia</p>
 <h3>Dane dziurkowano dziurkarkami, sprawdzano sprawdzarką, kopiowano reproducerami, sortowano sorterem, drukowano tabulatorem i liczono kalkulatorem</h3>
 <p class="fb-b">Kolatory łączyły karty z różnych plików w jeden według zadanych reguł. Osoba dziurkująca nie miała kontroli poprawności danych. Sorter oddzielał np. dane mężczyzn od danych kobiet.</p>
 <p class="fb-r">firma → <a href="#fb-ka-ibm">IBM</a></p>
 </article>
-<article id="fb-ka-ibm" class="fb-o"><p class="fb-m">Pytanie wykładowcy · 122:36-123:22</p>
+<article id="fb-ka-ibm" class="fb-o"><p class="fb-m">Pytanie wykładowcy</p>
 <h3>W 1911 r. firma Hollerith połączyła się z dwiema innymi, tworząc przyszły koncern IBM, którego nazwę nadano w 1924 r.</h3>
 <p class="fb-b">Prowadzący zapytał słuchaczy: „jaki koncern?”. International Business Machines przez dziesiątki lat było największym przedsiębiorstwem informatycznym na świecie.</p>
 </article>
 </section>
 <section id="fb-z-babb"><h2>19. Babbage i pierwszy program<small>123:22-131:36</small></h2>
-<article id="fb-bb-nieprog" class="fb-c"><p class="fb-m">Wada · 123:22-123:40</p>
+<article id="fb-bb-nieprog" class="fb-c"><p class="fb-m">Wada</p>
 <h3>Wcześniejsze maszyny liczące były pomysłowe, ale nie programowalne, więc nie są komputerami</h3>
 <p class="fb-b">Obliczenia prowadzono mechanicznie, a kolejność działań i ocenę wyników musiał prowadzić człowiek.</p>
 <p class="fb-r">dlatego → <a href="#fb-bb-poczatek">Początek informatyki</a></p>
 </article>
-<article id="fb-bb-poczatek" class="fb-c"><p class="fb-m">Początek · 123:40-124:00</p>
+<article id="fb-bb-poczatek" class="fb-c"><p class="fb-m">Początek</p>
 <h3>Za początek informatyki można uważać zbudowanie pierwszej programowalnej maszyny liczącej: mechanicznego komputera Charlesa Babbage&#x27;a</h3>
 <p class="fb-r">przyczyna → <a href="#fb-bb-bledy">Błędy w tablicach</a></p>
 </article>
-<article id="fb-bb-bledy" class="fb-c"><p class="fb-m">Przyczyna · 124:00-124:38</p>
+<article id="fb-bb-bledy" class="fb-c"><p class="fb-m">Przyczyna</p>
 <h3>Powodem były ogromne liczby błędów w naukowych publikacjach z obliczeniami</h3>
 <p class="fb-b">W tablicach astronomicznych znaleziono ponad 3700 błędów, a przy przygotowaniu errat wprowadzono kolejne. Potrzebna była maszyna automatycznie sprawdzająca i drukująca wyniki.</p>
 <p class="fb-r">doprowadziły do → <a href="#fb-bb-rozn1">Model z 1832</a></p>
 </article>
-<article id="fb-bb-rozn1" class="fb-c"><p class="fb-m">Maszyna różnicowa · 124:38-124:57</p>
+<article id="fb-bb-rozn1" class="fb-c"><p class="fb-m">Maszyna różnicowa</p>
 <h3>Pierwszy działający model mechanicznego kalkulatora powstał w 1832 r. dzięki współpracy Charlesa Babbage&#x27;a i Johna Clementa</h3>
 <p class="fb-b">Zawierał 2000 elementów.</p>
 <p class="fb-r">następnie → <a href="#fb-bb-rozn2">Maszyna różnicowa</a></p>
 </article>
-<article id="fb-bb-rozn2" class="fb-c"><p class="fb-m">Maszyna różnicowa · 124:57-125:41</p>
+<article id="fb-bb-rozn2" class="fb-c"><p class="fb-m">Maszyna różnicowa</p>
 <h3>Większej maszyny różnicowej (2,5 × 2 × 1 m) nie dokończono: po ponad 10 latach i 17 470 funtów porzucono pracę</h3>
 <p class="fb-b">Wykonano 12 tys. z 25 tys. zaprojektowanych elementów.</p>
 <p class="fb-r">niezrażony → <a href="#fb-bb-anal">Maszyna analityczna</a></p>
 </article>
-<article id="fb-bb-anal" class="fb-c"><p class="fb-m">Maszyna analityczna · 125:41-126:27</p>
+<article id="fb-bb-anal" class="fb-c"><p class="fb-m">Maszyna analityczna</p>
 <h3>W 1834 r. Babbage zaprojektował maszynę analityczną: prawdziwy komputer programowalny kartami dziurkowanymi (pomysł Jacquarda)</h3>
 <p class="fb-b">Z oddzielnym procesorem („młyn”) i pamięcią („skład”) oraz drukarką tabel i wykresów. Nigdy jej nie ukończono.</p>
 <p class="fb-r">nieukończona → <a href="#fb-bb-powod">Prawdziwy powód</a></p>
 </article>
-<article id="fb-bb-powod" class="fb-c"><p class="fb-m">Przyczyna · 126:27-126:43</p>
+<article id="fb-bb-powod" class="fb-c"><p class="fb-m">Przyczyna</p>
 <h3>Sądzono, że przyczyną był zbyt niski poziom mechaniki, ale powody okazały się bardziej skomplikowane</h3>
 <p class="fb-r">dowód → <a href="#fb-bb-replika">Replika z 1991</a></p>
 </article>
-<article id="fb-bb-replika" class="fb-c"><p class="fb-m">Replika · 126:43-128:00</p>
+<article id="fb-bb-replika" class="fb-c"><p class="fb-m">Replika</p>
 <h3>W 1991 r. Science Museum w Londynie uruchomiło replikę wg projektu Babbage&#x27;a: ponad 3 t metalu i ponad 4000 elementów</h3>
 <p class="fb-b">Wyniki z dokładnością do 31 cyfr znaczących (dzisiejsze komputery pokazują do 6). Jeden wynik wymagał ponad 27 tys. obrotów korbą. Koszt ok. pół miliona dolarów; firma budująca replikę zbankrutowała w 1990 r. po ponad 35 latach.</p>
 <p class="fb-r">prawdziwy powód → <a href="#fb-bb-charakter">Trudny charakter</a></p>
 </article>
-<article id="fb-bb-charakter" class="fb-c"><p class="fb-m">Przyczyna · 128:00-128:33</p>
+<article id="fb-bb-charakter" class="fb-c"><p class="fb-m">Przyczyna</p>
 <h3>Budowy nie ukończył trudny charakter Babbage&#x27;a: kłócił się ze współpracownikami, głównie z Josephem Clementem</h3>
 <p class="fb-b">Clement wiele wynalazł w dziedzinie zegarów. Panowie porzucili projekt.</p>
 </article>
-<article id="fb-bb-lov" class="fb-o"><p class="fb-m">Pytanie wykładowcy · 128:33-129:23</p>
+<article id="fb-bb-lov" class="fb-o"><p class="fb-m">Pytanie wykładowcy</p>
 <h3>Pierwszy program komputerowy napisała Augusta Ada, hrabina Lovelace</h3>
 <p class="fb-b">Córka angielskiego poety George&#x27;a Byrona. Prowadzący zapytał słuchaczy, kto to był, i przyznał, że do czasu tworzenia wykładu nie znał odpowiedzi.</p>
 <p class="fb-r">przetłumaczyła → <a href="#fb-bb-ada">Notatki Ady Lovelace</a></p>
 </article>
-<article id="fb-bb-ada" class="fb-c"><p class="fb-m">Pierwszy program · 129:23-130:27</p>
+<article id="fb-bb-ada" class="fb-c"><p class="fb-m">Pierwszy program</p>
 <h3>Ada Lovelace przetłumaczyła z włoskiego wykład Babbage&#x27;a, potrajając objętość tekstu własnymi komentarzami</h3>
 <p class="fb-b">Miała wykształcenie z logiki matematycznej. W jednej z notatek podała program do obliczania liczb Bernoulliego: pierwszy program komputerowy w historii.</p>
 </article>
-<article id="fb-bb-abc" class="fb-c"><p class="fb-m">ABC · 130:27-131:00</p>
+<article id="fb-bb-abc" class="fb-c"><p class="fb-m">ABC</p>
 <h3>Za dziadków współczesnych komputerów uważa się Johna Atanasoffa i Clifforda Berry&#x27;ego, twórców ABC z 1939 r.</h3>
 <p class="fb-b">Elektroniczny system liczący z 270 lampami elektronowymi. Nie był programowalny, więc formalnie nie jest komputerem.</p>
 <p class="fb-r">potem → <a href="#fb-bb-gen">Generacje komputerów</a></p>
 </article>
-<article id="fb-bb-gen" class="fb-c"><p class="fb-m">Dalej · 131:00-131:36</p>
+<article id="fb-bb-gen" class="fb-c"><p class="fb-m">Dalej</p>
 <h3>Historię komputerów wyznaczają generacje opisywane cechami technologicznymi; kolejny wykład zacznie się od ich podziału</h3>
 <p class="fb-b">Slajd: „Generacje komputerów”.</p>
 </article>
 </section>
 <section id="fb-z-zaj"><h2>20. Informacje o zajęciach<small>01:11-07:21, 61:14-77:44</small></h2>
-<article id="fb-a-50" class="fb-o"><p class="fb-m">Kolokwium · 03:55-04:10</p>
+<article id="fb-a-50" class="fb-o"><p class="fb-m">Kolokwium</p>
 <h3>50 pytań, odpowiedzi A/B/C</h3>
 </article>
-<article id="fb-a-26" class="fb-o"><p class="fb-m">Próg · 04:33-04:47</p>
+<article id="fb-a-26" class="fb-o"><p class="fb-m">Próg</p>
 <h3>26 punktów daje zaliczenie</h3>
 <p class="fb-b">Prowadzący poprawia się z 25 na 26.</p>
 </article>
-<article id="fb-a-0" class="fb-o"><p class="fb-m">Punktacja · 04:24-04:40</p>
+<article id="fb-a-0" class="fb-o"><p class="fb-m">Punktacja</p>
 <h3>0 punktów ujemnych</h3>
 <p class="fb-b">50 pytań, 50 punktów. Punktowana jest tylko poprawna odpowiedź.</p>
 </article>
-<article id="fb-a-10" class="fb-c"><p class="fb-m">Wymiar · 02:12-02:27</p>
+<article id="fb-a-10" class="fb-c"><p class="fb-m">Wymiar</p>
 <h3>10×3h spotkań = 30 godzin wykładu</h3>
 </article>
-<article id="fb-o-zdj" class="fb-o"><p class="fb-m">Uwaga wykładowcy · test · 03:49-04:18</p>
+<article id="fb-o-zdj" class="fb-o"><p class="fb-m">Uwaga wykładowcy · test</p>
 <h3>Pytania będą ze zdjęciem: co przedstawia, do czego służy albo kto był twórcą</h3>
 <p class="fb-b">Prowadzący: test wcale nie jest trudny.</p>
 </article>
-<article id="fb-z-obec" class="fb-c"><p class="fb-m">Zaliczenie · 03:02-03:32</p>
+<article id="fb-z-obec" class="fb-c"><p class="fb-m">Zaliczenie</p>
 <h3>Obecność nie wpływa na ocenę</h3>
 <p class="fb-r">bo zalicza → <a href="#fb-z-kolo">Kolokwium</a></p>
 </article>
-<article id="fb-z-kolo" class="fb-c"><p class="fb-m">Zaliczenie · 03:25-03:44</p>
+<article id="fb-z-kolo" class="fb-c"><p class="fb-m">Zaliczenie</p>
 <h3>Zaliczenie to kolokwium na ostatnich zajęciach, test na platformie Teams</h3>
 <p class="fb-r">forma → <a href="#fb-z-typ">Typ testu</a></p>
 </article>
-<article id="fb-z-typ" class="fb-c"><p class="fb-m">Zaliczenie · 03:40-03:49</p>
+<article id="fb-z-typ" class="fb-c"><p class="fb-m">Zaliczenie</p>
 <h3>W pierwszym terminie test jednokrotnego wyboru</h3>
 <p class="fb-b">W kolejnych terminach jedno- lub wielokrotnego wyboru.</p>
 </article>
-<article id="fb-o-uwazaj" class="fb-o"><p class="fb-m">Uwaga wykładowcy · przygotowanie · 05:43-06:00</p>
+<article id="fb-o-uwazaj" class="fb-o"><p class="fb-m">Uwaga wykładowcy · przygotowanie</p>
 <h3>Kto uważa na wykładach, spokojnie napisze kolokwium</h3>
 </article>
-<article id="fb-o-karta" class="fb-o"><p class="fb-m">Prośba wykładowcy · 06:00-06:30</p>
+<article id="fb-o-karta" class="fb-o"><p class="fb-m">Prośba wykładowcy</p>
 <h3>Zapoznajcie się z kartą przedmiotu</h3>
 <p class="fb-b">Po semestrze w ankiecie jest pytanie, czy prowadzący poinformował o konieczności zapoznania się z kartą przedmiotu.</p>
 </article>
-<article id="fb-pr-1" class="fb-c"><p class="fb-m">Program · 04:47-05:10</p>
+<article id="fb-pr-1" class="fb-c"><p class="fb-m">Program</p>
 <h3>Wykład nr 1 (o człowieku) został wykreślony, zajęcia zaczynają się od nr 2</h3>
 <p class="fb-b">Tamten wykład mówił o tym, jak człowiek w ogóle wziął się na świecie.</p>
 <p class="fb-r">zastąpiony przez → <a href="#fb-pr-tel">Telefonia komórkowa</a></p>
 </article>
-<article id="fb-pr-tel" class="fb-c"><p class="fb-m">Program · 05:10-05:22</p>
+<article id="fb-pr-tel" class="fb-c"><p class="fb-m">Program</p>
 <h3>W jego miejsce jest wykład o historii rozwoju telefonii komórkowej</h3>
 <p class="fb-b">Zdaniem prowadzącego ciekawszy dla studentów.</p>
 </article>
-<article id="fb-pr-lit" class="fb-c"><p class="fb-m">Literatura · 05:26-05:43</p>
+<article id="fb-pr-lit" class="fb-c"><p class="fb-m">Literatura</p>
 <h3>Literatura: do tworzenia wykładów oraz do samodzielnego studiowania i uzupełniająca</h3>
 </article>
-<article id="fb-org-forma" class="fb-c"><p class="fb-m">Organizacja · 06:30-07:10</p>
+<article id="fb-org-forma" class="fb-c"><p class="fb-m">Organizacja</p>
 <h3>Wykłady są zdalne, więc nie ma instruktażu na zagrożenie atakiem z powietrza</h3>
 <p class="fb-b">Studenci są u siebie; „gorzej na uczelni”.</p>
 </article>
-<article id="fb-org-kontakt" class="fb-c"><p class="fb-m">Kontakt · 01:20-02:12</p>
+<article id="fb-org-kontakt" class="fb-c"><p class="fb-m">Kontakt</p>
 <h3>Budynek C, ul. Wincentego Pola, III piętro, pokój 307A</h3>
 <p class="fb-b">Telefon jest na slajdzie, a e-mail prowadzący czyta na bieżąco. W razie potrzeby proszę się kontaktować.</p>
 </article>
-<article id="fb-o-przerwa" class="fb-o"><p class="fb-m">Prośba wykładowcy · 02:27-02:59, 61:14-61:21, 77:38-77:44</p>
+<article id="fb-o-przerwa" class="fb-o"><p class="fb-m">Prośba wykładowcy</p>
 <h3>Przerwa ok. 15 minut mniej więcej w połowie każdego spotkania</h3>
 <p class="fb-b">Prowadzący regeneruje głos. Przerwa była ok. 14:30 (61:14), a po niej prowadzący wrócił do wykładu.</p>
 </article>
-<article id="fb-org-czas" class="fb-c"><p class="fb-m">Organizacja · 131:10-131:42</p>
+<article id="fb-org-czas" class="fb-c"><p class="fb-m">Organizacja</p>
 <h3>Zajęcia trwają do 15:45, a ten blok skończył się o 15:42</h3>
 <p class="fb-b">Prowadzący: „widzimy się za parę tygodni”.</p>
 </article>
@@ -1223,7 +1236,7 @@ html.js-ok body.list { overflow:auto; height:auto; }
 
 <main id="view">
   <div id="stage">
-    <svg id="links"><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#45d0de"/></marker></defs><g id="paths"></g></svg>
+    <svg id="links"><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--cy)"/></marker></defs><g id="paths"></g></svg>
     <div id="pills"></div>
   </div>
 </main>
@@ -1299,7 +1312,6 @@ D.cards.forEach(c => {
     `<div class="ft"></div>`;
   Z[c.z].g.appendChild(el);
 });
-D.cards.forEach(c => { if (c.t) $(".ft", c.el).insertAdjacentHTML("beforeend", `<span class="tm">${esc(c.t)}</span>`); });
 $("#bottom").innerHTML = (D.nav || []).map((n, i) => `<button class="ni" type="button" data-i="${i}">${svg(n.icon)}<span>${esc(n.label)}</span></button>`).join("");
 
 /* ---------- layout: zones on a grid of cells, like frames on a Miro board ---------- */
