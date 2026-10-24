@@ -5,6 +5,8 @@
 <meta name="robots" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Komputery od lamp do eksaskali i telefonia komórkowa</title>
+<link rel="manifest" href="../../manifest.webmanifest"><link rel="icon" href="../../icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="../../apple-touch-icon.png"><meta name="theme-color" content="#000000">  <!-- a file sent alone just misses these -->
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Notatki">
 <script>try { document.documentElement.dataset.theme = localStorage.getItem('alsi-theme') || 'dark'; } catch (e) { document.documentElement.dataset.theme = 'dark'; }</script>
 <style>
 @font-face {
@@ -147,8 +149,13 @@ button { font:inherit; color:inherit; }
 
 /* equations (KaTeX, pre-rendered at build) and figures (inline SVG written with the lesson) */
 .eq { margin-top:8px; color:var(--ink); overflow-x:auto; overflow-y:hidden; }
-.eq .katex-display { margin:.3em 0; }
+.eq .katex-display { margin:.3em 0; text-align:left; } .eq .katex-display > .katex { text-align:left; }  /* derivations read like the board: from the left */
 .katex { font-size:1.12em; }
+/* worked examples written like the board: \htmlClass{hl|hlo}{..} highlights a fragment, {an|ano}{..} is the note saying what it does, {res}{..} the result */
+.katex .hl { background:var(--fl-cy); border-radius:4px; box-shadow:0 0 0 2px var(--fl-cy); }
+.katex .hlo { background:var(--fl-or); border-radius:4px; box-shadow:0 0 0 2px var(--fl-or); }
+.katex .an { color:var(--cy); } .katex .ano { color:var(--or); } .katex .res { color:var(--cy); }
+.katex .msupsub .an, .katex .msupsub .ano, .katex .mord.mover .an { font-size:1.5em; }  /* notes under/over a brace are script size: enlarge to readable */
 .fig { margin-top:10px; color:var(--soft); }
 .fig svg { display:block; width:100%; height:auto; }
 .fig text { fill:currentColor; font:14px/1 var(--mono); }

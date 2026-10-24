@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- full-bleed background (the launcher masks it); cards stay inside the central safe zone for maskable icons -->
+  <rect width="512" height="512" fill="#0b0b0c"/>
+  <g>
+    <rect x="136" y="146" width="240" height="62" rx="14" fill="#1c1c1f" stroke="#323236" stroke-width="3"/>
+    <rect x="136" y="146" width="14" height="62" rx="7" fill="#45d0de"/>
+    <rect x="168" y="166" width="150" height="9" rx="4.5" fill="#d9d9dc"/><rect x="168" y="184" width="104" height="7" rx="3.5" fill="#6a6a70"/>
+    <rect x="136" y="225" width="240" height="62" rx="14" fill="#1c1c1f" stroke="#323236" stroke-width="3"/>
+    <rect x="136" y="225" width="14" height="62" rx="7" fill="#ff7a1a"/>
+    <rect x="168" y="245" width="128" height="9" rx="4.5" fill="#d9d9dc"/><rect x="168" y="263" width="160" height="7" rx="3.5" fill="#6a6a70"/>
+    <rect x="136" y="304" width="240" height="62" rx="14" fill="#1c1c1f" stroke="#323236" stroke-width="3"/>
+    <rect x="136" y="304" width="14" height="62" rx="7" fill="#ff4fc0"/>
+    <rect x="168" y="324" width="160" height="9" rx="4.5" fill="#d9d9dc"/><rect x="168" y="342" width="90" height="7" rx="3.5" fill="#6a6a70"/>
+  </g>
+</svg>
