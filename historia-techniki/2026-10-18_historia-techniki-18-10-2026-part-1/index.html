@@ -89,6 +89,7 @@ html.js-ok body { overflow:hidden; height:100vh; height:100dvh; }
 button { font:inherit; color:inherit; }
 
 /* header, like the "Historia" screen: big title, round outlined buttons, centered stepper */
+#top, #bottom, #ctrl { transform:translateZ(0); }  /* own compositor layers: the moving board never drags them into a re-raster */
 #top { position:fixed; z-index:6; top:0; left:0; right:0; padding:calc(env(safe-area-inset-top) + 14px) 16px 22px;
   background:linear-gradient(var(--bg) 62%, transparent); pointer-events:none; }
 #top > * { pointer-events:auto; }
@@ -519,14 +520,25 @@ function draw() {
 const V = { x: 0, y: 0, k: 1 };
 const clampK = k => Math.max(.05, Math.min(2.5, k));
 let raf = 0;
-let wc = 0;
+let wc = 0, tt = 0, rasterK = NaN;
+const COARSE = matchMedia("(pointer: coarse)").matches;
+// The board keeps its compositor layer while it is only panned: dropping and re-creating the layer at every pause of a drag made a
+// tablet (Galaxy Tab S10 FE+) re-raster everything at the start of each gesture, so cards and the header flickered.
+// Only after the ZOOM changed is the layer re-made once, at rest, so the text is rastered sharp at the new scale.
+const REST = COARSE ? 600 : 180;
 function apply(anim) {
   stage.style.willChange = "transform"; clearTimeout(wc);
-  wc = setTimeout(() => { stage.style.willChange = "auto"; }, anim ? 700 : 180);  // at rest the browser re-rasters at the real scale, so text is sharp
+  if (V.k !== rasterK) wc = setTimeout(() => {
+    stage.style.willChange = "auto";
+    requestAnimationFrame(() => requestAnimationFrame(() => { stage.style.willChange = "transform"; rasterK = V.k; }));
+  }, anim ? Math.max(700, REST) : REST);
   stage.classList.toggle("anim", !!anim); view.classList.toggle("anim", !!anim);
   stage.style.transform = `translate(${V.x}px,${V.y}px) scale(${V.k})`;
   view.style.backgroundPosition = `${(V.x * .2).toFixed(1)}px ${(V.y * .2).toFixed(1)}px`;  // minimal parallax
-  if (!raf) raf = requestAnimationFrame(() => { raf = 0; track(); });
+  // touch: the zone label and nav highlight change only once the board rests; changing them mid-drag made the tablet
+  // re-raster the header while the GPU was busy with the board, and the whole header blinked out for a few frames
+  if (COARSE) { clearTimeout(tt); tt = setTimeout(track, 250); }
+  else if (!raf) raf = requestAnimationFrame(() => { raf = 0; track(); });
 }
 /* Smooth navigation, like the Obsidian canvas / Miro: wheel, + - and arrow keys only move a TARGET; every frame the view eases toward it.
    zt = target scale plus the world point that must stay under the cursor (scale eases geometrically, so in and out feel equal);
