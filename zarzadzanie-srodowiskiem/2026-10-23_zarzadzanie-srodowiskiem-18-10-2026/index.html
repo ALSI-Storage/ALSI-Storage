@@ -6,8 +6,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Wymagania normy ISO 14001: kontekst, przywództwo, planowanie</title>
 <link rel="manifest" href="../../manifest.webmanifest"><link rel="icon" href="../../icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="../../apple-touch-icon.png"><meta name="theme-color" content="#000000">  <!-- a file sent alone just misses these -->
-<meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Notatki">
-<script>try { document.documentElement.dataset.theme = localStorage.getItem('alsi-theme') || 'dark'; } catch (e) { document.documentElement.dataset.theme = 'dark'; }</script>
+<meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Notatki">
+<script>try { document.documentElement.dataset.theme = localStorage.getItem('alsi-theme') || 'dark'; } catch (e) { document.documentElement.dataset.theme = 'dark'; }
+document.querySelector('meta[name=theme-color]').content = document.documentElement.dataset.theme === 'light' ? '#e9ecf0' : '#000000';  // system bar of the installed app = page background</script>
 <style>
 @font-face {
   font-family: 'IBM Plex Mono';
@@ -110,6 +111,7 @@ button { font:inherit; color:inherit; }
 #view.drag { cursor:grabbing; }
 #stage { position:absolute; left:0; top:0; width:0; height:0; transform-origin:0 0; }  /* will-change is set from script only while moving: a permanent one keeps the layer rastered at zoom 1, so every zoom-in looks blurry */
 #stage.anim { transition:transform .55s cubic-bezier(.2,.8,.2,1); }
+#view.anim { transition:background-position .55s cubic-bezier(.2,.8,.2,1); }  /* the dots follow the board at a fifth of its speed (parallax) */
 .zone { position:absolute; width:max-content; border:1.5px solid var(--zone-bd); border-radius:38px; padding:28px 28px 32px; }
 .zone::before { content:""; position:absolute; top:0; right:0; bottom:0; left:0; border-radius:inherit; background:var(--zone-bg); z-index:0; }  /* layers: zone bg 0 < links 1 < labels 2 < cards 3 */
 .zh { position:relative; z-index:3; display:flex; justify-content:space-between; align-items:baseline; gap:24px; margin:0 6px 22px; }
@@ -1154,8 +1156,9 @@ let wc = 0;
 function apply(anim) {
   stage.style.willChange = "transform"; clearTimeout(wc);
   wc = setTimeout(() => { stage.style.willChange = "auto"; }, anim ? 700 : 180);  // at rest the browser re-rasters at the real scale, so text is sharp
-  stage.classList.toggle("anim", !!anim);
+  stage.classList.toggle("anim", !!anim); view.classList.toggle("anim", !!anim);
   stage.style.transform = `translate(${V.x}px,${V.y}px) scale(${V.k})`;
+  view.style.backgroundPosition = `${(V.x * .2).toFixed(1)}px ${(V.y * .2).toFixed(1)}px`;  // minimal parallax
   if (!raf) raf = requestAnimationFrame(() => { raf = 0; track(); });
 }
 /* Smooth navigation, like the Obsidian canvas / Miro: wheel, + - and arrow keys only move a TARGET; every frame the view eases toward it.

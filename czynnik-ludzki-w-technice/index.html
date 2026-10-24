@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Czynnik ludzki w technice · Biblioteka notatek</title>
 <link rel="manifest" href="../manifest.webmanifest"><link rel="icon" href="../icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="../apple-touch-icon.png"><meta name="theme-color" content="#000000">
-<meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Notatki">
+<meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Notatki">
 <script>try { document.documentElement.dataset.theme = localStorage.getItem('alsi-theme') || 'dark'; } catch (e) { document.documentElement.dataset.theme = 'dark'; }</script>
 <style>
 @font-face {
@@ -125,6 +125,7 @@ const SVG = { sun: '<circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12
 const tg = document.getElementById('theme');
 function setTheme(t, save = true) {
   document.documentElement.dataset.theme = t;
+  document.querySelector('meta[name=theme-color]').content = t === 'light' ? '#e9ecf0' : '#000000';  // system bar of the installed app = page background
   tg.innerHTML = `<svg viewBox="0 0 24 24">${t === 'light' ? SVG.moon : SVG.sun}</svg>`; tg.title = t === 'light' ? 'Ciemny motyw' : 'Jasny motyw';
   if (save) try { localStorage.setItem('alsi-theme', t); } catch (e) {}
   dirty = true;
@@ -136,6 +137,7 @@ tg.onclick = () => setTheme(document.documentElement.dataset.theme === 'light' ?
 // (Vanilla port of the React KineticGrid, toned down on purpose.)
 const kg = document.getElementById('kg'), g = kg.getContext('2d');
 const CELL = 32, RADIUS = 200, WARP = 13, LERP = .08, EDGE = 1.5, FLOW = .004;  // FLOW: colour-wheel steps per pixel of pointer travel (3 steps = one full cycle)
+const PAR = .15;  // parallax: the grid drifts with a sixth or so of the page scroll
 const PAL = { dark:  { line: [255, 255, 255, .035], node: [255, 255, 255, .15], a: .55, brand: [[69, 208, 222], [255, 122, 26], [255, 79, 192]] },
               light: { line: [25, 35, 55, .04],     node: [25, 35, 55, .16],    a: .5,  brand: [[7, 121, 140], [184, 83, 10], [168, 37, 111]] } };
 let W = 0, H = 0, dirty = true, phase = 0, mouse = { x: -9999, y: -9999 }, goal = { x: -9999, y: -9999 }, ripples = [];
@@ -179,8 +181,10 @@ function frame(now) {
     p.r = Math.max(0, age * 400); p.o = Math.max(0, 1 - age * 1.2);
     if (p.o <= 0) ripples.splice(i, 1);
   }
-  const cols = Math.max(2, Math.ceil(W / CELL)) + 1, rows = Math.max(2, Math.ceil(H / CELL)) + 1, cw = W / (cols - 1), ch = H / (rows - 1), P = [];
-  for (let r = 0; r < rows; r++) { P[r] = []; for (let c = 0; c < cols; c++) P[r][c] = warp(c * cw, r * ch, c, r, cols, rows); }
+  const cols = Math.max(2, Math.ceil(W / CELL)) + 1, rows = Math.max(2, Math.ceil(H / CELL)) + 2, cw = W / (cols - 1), ch = H / (rows - 2), P = [];
+  // half a cell in from the edges, so no dot is cut in half by the screen edge or the app's title bar; shifted by the scroll (parallax)
+  const x0 = cw / 2, y0 = ch / 2 - ((scrollY * PAR) % ch);
+  for (let r = 0; r < rows; r++) { P[r] = []; for (let c = 0; c < cols; c++) P[r][c] = warp(x0 + c * cw, y0 + r * ch, c, r, cols, rows); }
   // colour at a point: the wheel position moves with pointer travel, plus a slow spatial offset so the colour flows across the lit area
   const hue = p => { const c = wheel(pal.brand, phase + (p.x * .0016 + p.y * .0011)); c.push(pal.a); return c; };
   // resting lines/dots (almost all of them) go into one batched path each; only the lit ones are drawn one by one
@@ -214,7 +218,7 @@ function frame(now) {
     const c = hue(p); g.beginPath(); g.arc(p.x, p.y, p.r, 0, 7); g.strokeStyle = `rgba(${c[0] | 0},${c[1] | 0},${c[2] | 0},${(p.o * .12).toFixed(3)})`; g.lineWidth = 1.5; g.stroke();
   }
 }
-fit(); addEventListener('resize', fit);
+fit(); addEventListener('resize', fit); addEventListener('scroll', () => { dirty = true; }, { passive: true });
 if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {  // reduced motion: a still grid, no warp, flow or ripples
   addEventListener('mousemove', e => {
     if (goal.x > -9000) phase += Math.hypot(e.clientX - goal.x, e.clientY - goal.y) * FLOW;
