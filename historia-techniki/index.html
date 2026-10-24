@@ -58,7 +58,7 @@ main { position:relative; z-index:1; margin:0 auto; padding:calc(env(safe-area-i
 @media (display-mode: fullscreen) { main { padding-top:calc(env(safe-area-inset-top) + 40px); } }  /* installed app runs fullscreen: no system bar above the title */
 .hd { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; }
 .tg { flex:none; width:48px; height:48px; display:grid; place-items:center; padding:0; color:var(--tx); text-decoration:none; background:var(--chip-bg); border:1.5px solid var(--chip-bd); border-radius:50%; cursor:pointer; transition:border-color .2s, background-color .35s, color .35s; }
-.tg:hover { border-color:var(--ac, var(--cy)); }
+body:not(.away) .tg:hover { border-color:var(--ac, var(--cy)); }
 .tg svg { width:24px; height:24px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
 h1 { margin:0; font-size:32px; line-height:1.1; font-weight:700; letter-spacing:-.02em; }
 .sub { color:var(--mu); font-size:12px; margin:4px 0 26px; }
@@ -76,12 +76,12 @@ main { max-width:76rem; padding-bottom:96px; }
 .search svg { position:absolute; left:16px; top:50%; width:18px; height:18px; margin-top:-9px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; pointer-events:none; }
 .search input { width:100%; height:46px; padding:0 18px 0 44px; font:inherit; font-size:14px; color:var(--tx); background:var(--chip-bg); border:1.5px solid var(--chip-bd); border-radius:999px; outline:none;
   transition:border-color .25s, box-shadow .25s, background-color .35s; }
-.search:hover, .search:focus-within { color:var(--ac); }
-.search input:hover, .search input:focus { border-color:var(--ac); box-shadow:0 0 0 1px var(--ac), 0 0 24px -10px var(--ac); }
+body:not(.away) .search:hover, .search:focus-within { color:var(--ac); }
+body:not(.away) .search input:hover, .search input:focus { border-color:var(--ac); box-shadow:0 0 0 1px var(--ac), 0 0 24px -10px var(--ac); }
 .search input::placeholder { color:var(--mu); }
 .sort { flex:none; height:46px; display:flex; align-items:center; gap:10px; padding:0 20px 0 16px; font:inherit; font-size:14px; color:var(--soft); cursor:pointer;
   background:var(--chip-bg); border:1.5px solid var(--chip-bd); border-radius:999px; transition:border-color .25s, box-shadow .25s, background-color .35s, color .35s; }
-.sort:hover { border-color:var(--ac); box-shadow:0 0 0 1px var(--ac), 0 0 24px -10px var(--ac); }
+body:not(.away) .sort:hover { border-color:var(--ac); box-shadow:0 0 0 1px var(--ac), 0 0 24px -10px var(--ac); }
 .sort svg { width:18px; height:18px; fill:none; stroke:var(--ac); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; transition:transform .3s ease; }
 .sort.asc svg { transform:rotate(180deg); }
 .list { padding:18px; border-radius:32px; }
@@ -89,7 +89,7 @@ main { max-width:76rem; padding-bottom:96px; }
   background:var(--s1); border:1px solid var(--bd); border-radius:20px; transition:border-color .2s, transform .2s, background-color .35s; }
 .row:last-of-type { margin-bottom:0; }
 .row[hidden] { display:none; }
-.row:hover, .row:focus-visible { border-color:var(--ac); transform:translateY(-1px); outline:none; }
+body:not(.away) .row:hover, .row:focus-visible { border-color:var(--ac); transform:translateY(-1px); outline:none; }
 .row .bar { position:absolute; left:12px; top:14px; bottom:14px; width:6px; border-radius:6px; background:var(--ac); }
 .row .k { flex:none; min-width:7.5rem; font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--ac); }
 .row .nm { flex:1; min-width:0; font-size:17px; font-weight:700; letter-spacing:-.01em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -240,6 +240,16 @@ if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {  // reduced motio
   addEventListener('pointerup', e => { if (e.pointerType !== 'mouse') on = 0; });
   addEventListener('touchend', () => { on = 0; }); addEventListener('touchcancel', () => { on = 0; });
   document.addEventListener('pointerout', e => { if (!e.relatedTarget) on = 0; });
+  // Chrome on Android sends NOTHING when a hovering pen leaves its range (measured on a Galaxy Tab), while a pen in range reports
+  // every ~11 ms even when still. So silence = pen gone: fade the glow and drop the hover highlights (body.away gates every :hover).
+  let penIdle = 0;
+  const penAlive = e => {
+    if (e.pointerType !== 'pen') return;
+    document.body.classList.remove('away'); clearTimeout(penIdle);
+    penIdle = setTimeout(() => { on = 0; document.body.classList.add('away'); }, 300);
+  };
+  addEventListener('onpointerrawupdate' in window ? 'pointerrawupdate' : 'pointermove', penAlive, { passive: true });
+  addEventListener('pointermove', e => { if (e.pointerType === 'mouse') document.body.classList.remove('away'); }, { passive: true });
   addEventListener('click', e => ripples.push({ x: e.clientX, y: e.clientY, r: 0, o: 1, born: performance.now() }));
 }
 requestAnimationFrame(frame);

@@ -58,7 +58,7 @@ main { position:relative; z-index:1; margin:0 auto; padding:calc(env(safe-area-i
 @media (display-mode: fullscreen) { main { padding-top:calc(env(safe-area-inset-top) + 40px); } }  /* installed app runs fullscreen: no system bar above the title */
 .hd { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; }
 .tg { flex:none; width:48px; height:48px; display:grid; place-items:center; padding:0; color:var(--tx); text-decoration:none; background:var(--chip-bg); border:1.5px solid var(--chip-bd); border-radius:50%; cursor:pointer; transition:border-color .2s, background-color .35s, color .35s; }
-.tg:hover { border-color:var(--ac, var(--cy)); }
+body:not(.away) .tg:hover { border-color:var(--ac, var(--cy)); }
 .tg svg { width:24px; height:24px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
 h1 { margin:0; font-size:32px; line-height:1.1; font-weight:700; letter-spacing:-.02em; }
 .sub { color:var(--mu); font-size:12px; margin:4px 0 26px; }
@@ -76,19 +76,19 @@ nav a { display:flex; align-items:center; gap:10px; min-height:54px; padding:8px
 nav a::before { content:""; flex:none; align-self:stretch; width:4px; border-radius:2px; background:var(--ac); }
 nav a span { flex:1; min-width:0; overflow-wrap:break-word; }
 nav a.wide { grid-column:span 2; }
-nav a:hover { border-color:var(--ac,var(--cy)); }
+body:not(.away) nav a:hover { border-color:var(--ac,var(--cy)); }
 nav a b { flex:none; color:var(--ac); }
 .zone { margin:0 0 22px; scroll-margin-top:16px; }
 .zt a { color:inherit; text-decoration:none; outline:none; }
 .zt a::after { content:""; position:absolute; inset:0; border-radius:38px; }  /* stretched link: the whole zone opens the subject page; the lecture lines sit above it */
-body:not(.nohover) .zone:hover, .zone.on, .zone:focus-within { border-color:var(--ac); box-shadow:0 0 0 1px var(--ac), 0 0 28px -8px var(--ac), var(--zone-sh); outline:none; }  /* hover and "just arrived" share one look; transition = fade in/out */
+body:not(.nohover):not(.away) .zone:hover, .zone.on, .zone:focus-within { border-color:var(--ac); box-shadow:0 0 0 1px var(--ac), 0 0 28px -8px var(--ac), var(--zone-sh); outline:none; }  /* hover and "just arrived" share one look; transition = fade in/out */
 .zh { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:baseline; gap:4px 16px; margin:0 6px 20px; }  /* a long name pushes the count below, not off screen */
 .zt { margin:0; min-width:0; overflow-wrap:break-word; font-size:30px; font-weight:700; letter-spacing:-.02em; line-height:1.1; }
 .zs { color:var(--mu); font-size:14px; white-space:nowrap; }
 .latest { display:grid; gap:2px; min-height:112px; align-content:start; }  /* 3 lines; same zone height as the old single card */
 .ln { position:relative; z-index:1; display:flex; align-items:center; gap:14px; margin:0 -12px; padding:6px 12px; border-radius:14px; line-height:24px; font-size:15px; min-width:0; color:inherit; text-decoration:none; transition:background-color .2s; }  /* roomy hit area */
-a.ln:hover, a.ln:focus-visible { background:color-mix(in srgb, var(--ac) 12%, transparent); }
-a.ln .nm { transition:color .2s; } a.ln:hover .nm, a.ln:focus-visible .nm { color:var(--ac); text-decoration:underline; text-underline-offset:3px; } a.ln { outline:none; }
+body:not(.away) a.ln:hover, a.ln:focus-visible { background:color-mix(in srgb, var(--ac) 12%, transparent); }
+a.ln .nm { transition:color .2s; } body:not(.away) a.ln:hover .nm, a.ln:focus-visible .nm { color:var(--ac); text-decoration:underline; text-underline-offset:3px; } a.ln { outline:none; }
 .ln i { flex:none; width:7px; height:7px; border-radius:50%; background:var(--ac); }
 .ln .nm { flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .ln .dt { flex:none; color:var(--mu); font-size:12px; }
@@ -228,6 +228,16 @@ if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {  // reduced motio
   addEventListener('pointerup', e => { if (e.pointerType !== 'mouse') on = 0; });
   addEventListener('touchend', () => { on = 0; }); addEventListener('touchcancel', () => { on = 0; });
   document.addEventListener('pointerout', e => { if (!e.relatedTarget) on = 0; });
+  // Chrome on Android sends NOTHING when a hovering pen leaves its range (measured on a Galaxy Tab), while a pen in range reports
+  // every ~11 ms even when still. So silence = pen gone: fade the glow and drop the hover highlights (body.away gates every :hover).
+  let penIdle = 0;
+  const penAlive = e => {
+    if (e.pointerType !== 'pen') return;
+    document.body.classList.remove('away'); clearTimeout(penIdle);
+    penIdle = setTimeout(() => { on = 0; document.body.classList.add('away'); }, 300);
+  };
+  addEventListener('onpointerrawupdate' in window ? 'pointerrawupdate' : 'pointermove', penAlive, { passive: true });
+  addEventListener('pointermove', e => { if (e.pointerType === 'mouse') document.body.classList.remove('away'); }, { passive: true });
   addEventListener('click', e => ripples.push({ x: e.clientX, y: e.clientY, r: 0, o: 1, born: performance.now() }));
 }
 requestAnimationFrame(frame);
