@@ -91,6 +91,7 @@ button { font:inherit; color:inherit; }
 
 /* header, like the "Historia" screen: big title, round outlined buttons, centered stepper */
 #top, #bottom, #ctrl { transform:translateZ(0); }  /* own compositor layers: the moving board never drags them into a re-raster */
+@media (display-mode: fullscreen) { #top { padding-top:calc(env(safe-area-inset-top) + 26px) !important; } #map { padding-top:calc(env(safe-area-inset-top) + 30px) !important; } }  /* installed app: fullscreen, no system bar */
 #top { position:fixed; z-index:6; top:0; left:0; right:0; padding:calc(env(safe-area-inset-top) + 14px) 16px 22px;
   background:linear-gradient(var(--bg) 62%, transparent); pointer-events:none; }
 #top > * { pointer-events:auto; }
