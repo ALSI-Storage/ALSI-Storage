@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="robots" content="noindex, nofollow">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Czynnik ludzki w technice · Biblioteka notatek</title>
 <link rel="manifest" href="../manifest.webmanifest"><link rel="icon" href="../icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="../apple-touch-icon.png"><meta name="theme-color" content="#000000">
 <meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Notatki">
@@ -141,6 +141,7 @@ const PAR = .15;  // parallax: the grid drifts with a sixth or so of the page sc
 const PAL = { dark:  { line: [255, 255, 255, .035], node: [255, 255, 255, .15], a: .55, brand: [[69, 208, 222], [255, 122, 26], [255, 79, 192]] },
               light: { line: [25, 35, 55, .04],     node: [25, 35, 55, .16],    a: .5,  brand: [[7, 121, 140], [184, 83, 10], [168, 37, 111]] } };
 let W = 0, H = 0, dirty = true, phase = 0, mouse = { x: -9999, y: -9999 }, goal = { x: -9999, y: -9999 }, ripples = [];
+let amp = 0, on = 0, lastY = scrollY;  // glow strength eases to 'on': 1 while a pointer/pen/finger is over the page, 0 once it is lifted or leaves
 const mix = (a, b, t) => a + (b - a) * t;
 const rgba = (a, b, t) => `rgba(${[0, 1, 2].map(i => Math.round(mix(a[i], b[i], t)))},${mix(a[3], b[3], t).toFixed(3)})`;
 function wheel(brand, p) {  // smooth walk around the three brand colours
@@ -153,7 +154,7 @@ function fit() {
 }
 function warp(x, y, c, r, cols, rows) {  // displaced point + how close the pointer is (0..1)
   const pin = Math.min(c / EDGE, (cols - 1 - c) / EDGE, 1) ** 2 * Math.min(r / EDGE, (rows - 1 - r) / EDGE, 1) ** 2;  // borders stay put
-  const dx = x - mouse.x, dy = y - mouse.y, dist = Math.hypot(dx, dy), near = Math.max(0, 1 - dist / RADIUS) * pin;
+  const dx = x - mouse.x, dy = y - mouse.y, dist = Math.hypot(dx, dy), near = Math.max(0, 1 - dist / RADIUS) * pin * amp;
   let ox = 0, oy = 0;
   for (const p of ripples) {
     const rx = x - p.x, ry = y - p.y, diff = Math.hypot(rx, ry) - p.r;
@@ -163,15 +164,15 @@ function warp(x, y, c, r, cols, rows) {  // displaced point + how close the poin
     }
   }
   if (dist < RADIUS && dist > 0 && pin > 0) {
-    const t = dist / RADIUS, w = (1 - t) * (1 - t) * Math.min(1, dist / 60) * WARP * pin, a = Math.atan2(dy, dx);
+    const t = dist / RADIUS, w = (1 - t) * (1 - t) * Math.min(1, dist / 60) * WARP * pin * amp, a = Math.atan2(dy, dx);
     ox -= Math.cos(a) * w; oy -= Math.sin(a) * w;
   }
   return { x: x + ox, y: y + oy, near };
 }
 function frame(now) {
   requestAnimationFrame(frame);
-  mouse.x = mix(mouse.x, goal.x, LERP); mouse.y = mix(mouse.y, goal.y, LERP);
-  const moving = Math.abs(mouse.x - goal.x) + Math.abs(mouse.y - goal.y) > .2;
+  mouse.x = mix(mouse.x, goal.x, LERP); mouse.y = mix(mouse.y, goal.y, LERP); amp = mix(amp, on, .1);
+  const moving = Math.abs(mouse.x - goal.x) + Math.abs(mouse.y - goal.y) > .2 || Math.abs(amp - on) > .004;
   if (!dirty && !moving && !ripples.length) return;  // nothing changes: skip the redraw
   dirty = false;
   const pal = PAL[document.documentElement.dataset.theme === 'light' ? 'light' : 'dark'];
@@ -218,15 +219,24 @@ function frame(now) {
     const c = hue(p); g.beginPath(); g.arc(p.x, p.y, p.r, 0, 7); g.strokeStyle = `rgba(${c[0] | 0},${c[1] | 0},${c[2] | 0},${(p.o * .12).toFixed(3)})`; g.lineWidth = 1.5; g.stroke();
   }
 }
-fit(); addEventListener('resize', fit); addEventListener('scroll', () => { dirty = true; }, { passive: true });
+fit(); addEventListener('resize', fit);
+addEventListener('scroll', () => {  // the grid drifts (parallax) and the colour flows with the scrolled distance too
+  phase += Math.abs(scrollY - lastY) * FLOW; lastY = scrollY; dirty = true;
+}, { passive: true });
 if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {  // reduced motion: a still grid, no warp, flow or ripples
   const follow = (x, y) => {  // the lit spot follows the pointer, and the colour flows with the distance travelled
-    if (goal.x > -9000) phase += Math.hypot(x - goal.x, y - goal.y) * FLOW;
-    goal = { x, y };
+    if (goal.x > -9000 && amp > .05) phase += Math.hypot(x - goal.x, y - goal.y) * FLOW;
+    if (amp < .05) mouse = { x, y };  // after a lift the glow comes back where the pen/finger lands, not sliding from the old spot
+    goal = { x, y }; on = 1;
   };
   addEventListener('pointermove', e => follow(e.clientX, e.clientY), { passive: true });  // mouse, pen hover, pen and finger
+  addEventListener('pointerdown', e => follow(e.clientX, e.clientY), { passive: true });
   // a pen or finger drag that scrolls the page cancels pointer events, but touchmove keeps coming
   addEventListener('touchmove', e => { const t = e.touches[0]; if (t) follow(t.clientX, t.clientY); }, { passive: true });
+  // lifted finger or pen, pen out of hover range, mouse out of the window: the glow fades away
+  addEventListener('pointerup', e => { if (e.pointerType !== 'mouse') on = 0; });
+  addEventListener('touchend', () => { on = 0; }); addEventListener('touchcancel', () => { on = 0; });
+  document.addEventListener('pointerout', e => { if (!e.relatedTarget) on = 0; });
   addEventListener('click', e => ripples.push({ x: e.clientX, y: e.clientY, r: 0, o: 1, born: performance.now() }));
 }
 requestAnimationFrame(frame);
