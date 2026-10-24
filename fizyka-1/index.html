@@ -220,10 +220,13 @@ function frame(now) {
 }
 fit(); addEventListener('resize', fit); addEventListener('scroll', () => { dirty = true; }, { passive: true });
 if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {  // reduced motion: a still grid, no warp, flow or ripples
-  addEventListener('mousemove', e => {
-    if (goal.x > -9000) phase += Math.hypot(e.clientX - goal.x, e.clientY - goal.y) * FLOW;
-    goal = { x: e.clientX, y: e.clientY };
-  });
+  const follow = (x, y) => {  // the lit spot follows the pointer, and the colour flows with the distance travelled
+    if (goal.x > -9000) phase += Math.hypot(x - goal.x, y - goal.y) * FLOW;
+    goal = { x, y };
+  };
+  addEventListener('pointermove', e => follow(e.clientX, e.clientY), { passive: true });  // mouse, pen hover, pen and finger
+  // a pen or finger drag that scrolls the page cancels pointer events, but touchmove keeps coming
+  addEventListener('touchmove', e => { const t = e.touches[0]; if (t) follow(t.clientX, t.clientY); }, { passive: true });
   addEventListener('click', e => ripples.push({ x: e.clientX, y: e.clientY, r: 0, o: 1, born: performance.now() }));
 }
 requestAnimationFrame(frame);
