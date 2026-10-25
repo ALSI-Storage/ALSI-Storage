@@ -6,6 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Funkcje i ich własności</title>
 <link rel="manifest" href="../../manifest.webmanifest"><link rel="icon" href="../../icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="../../apple-touch-icon.png"><meta name="theme-color" content="#000000">  <!-- a file sent alone just misses these -->
+<script>if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('../../sw.js').catch(() => {}));</script>  <!-- offline copy (template/sw.js); fails quietly where there is no sw.js -->
 <meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Notatki">
 <script>try { document.documentElement.dataset.theme = localStorage.getItem('alsi-theme') || 'dark'; } catch (e) { document.documentElement.dataset.theme = 'dark'; }
 document.querySelector('meta[name=theme-color]').content = document.documentElement.dataset.theme === 'light' ? '#e9ecf0' : '#000000';  // system bar of the installed app = page background</script>
