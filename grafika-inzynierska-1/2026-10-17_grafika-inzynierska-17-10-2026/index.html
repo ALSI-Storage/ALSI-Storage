@@ -119,7 +119,7 @@ button { font:inherit; color:inherit; }
 .zh { position:relative; z-index:3; display:flex; justify-content:space-between; align-items:baseline; gap:24px; margin:0 6px 22px; }
 .zt { font-size:36px; font-weight:700; letter-spacing:-.02em; line-height:1.1; }
 .zs { color:var(--mu); font-size:15px; white-space:nowrap; }
-.zg { position:relative; display:grid; grid-template-columns:repeat(var(--cols,2),380px); gap:66px 96px; align-items:start; }  /* room for labelled arrows between cards */
+.zg { position:relative; display:grid; grid-template-columns:repeat(var(--cols,2),440px); gap:66px 96px; align-items:start; }  /* room for labelled arrows between cards */
 
 /* cards, like the transaction rows: colored bar, title, right-aligned time */
 .card { min-width:0; overflow-wrap:break-word; position:relative; z-index:3; background:var(--s1); border:1px solid var(--bd); border-radius:22px; padding:16px 18px 13px 28px; user-select:none; -webkit-user-select:none; }
@@ -127,12 +127,12 @@ button { font:inherit; color:inherit; }
 .k-o { background:var(--o-bg); border-color:var(--o-bd); } .k-o .bar { background:var(--or); }
 .k-f { background:var(--f-bg); border-color:var(--f-bd); } .k-f .bar { background:var(--fu); }
 .k-g { border-style:dashed; border-color:var(--chip-bd); } .k-g .bar { background:transparent; border:2px solid var(--gr); }
-.ty { font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--mu); margin-bottom:5px; }
+.ty { font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--mu); margin-bottom:5px; }
 .k-o .ty { color:var(--or); } .k-f .ty { color:var(--fu); }
-.ti { margin:0; font-size:17px; line-height:1.32; font-weight:700; letter-spacing:-.01em; }
+.ti { margin:0; font-size:19px; line-height:1.32; font-weight:700; letter-spacing:-.01em; }
 .n { font-size:46px; line-height:1; font-weight:700; color:var(--cy); margin:2px 0 6px; letter-spacing:-.03em; }
 .k-o .n { color:var(--or); } .k-f .n { color:var(--fu); }
-.bd { font-size:14.5px; line-height:1.55; color:var(--soft); margin-top:6px; }
+.bd { font-size:16px; line-height:1.6; color:var(--soft); margin-top:6px; }
 .bd b { color:var(--ink); }
 .ft { display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin-top:11px; } .ft:empty { display:none; }  /* card timestamps (c.t) are data for the completeness check, not shown */
 .zn { display:inline-grid; place-items:center; min-width:1.45em; height:1.45em; padding:0 .3em; margin-right:.5em; border:1.5px solid var(--chip-bd); border-radius:999px; font-style:normal; font-size:.5em; font-weight:700; color:var(--mu); vertical-align:.3em; }
@@ -170,6 +170,37 @@ button { font:inherit; color:inherit; }
 .fig .da { stroke-dasharray:6 5; }
 .fig .ar.cy { marker-end:url(#a-c); } .fig .ar.or { marker-end:url(#a-o); } .fig .ar.fu { marker-end:url(#a-f); } .fig .ar.sh, .fig .ar.ax { marker-end:url(#a-w); }
 .fig .tc { fill:var(--cy); } .fig .to { fill:var(--or); } .fig .tf { fill:var(--fu); }
+/* kartka (math, physics): one sheet of paper per task. Header = what to solve (q), then the solution line under line; "#..." eq lines are
+   milestone step headings. Figures (figs) stand right of the lines, each at the height of its line. Descriptions live outside the sheet, in
+   .side, each at the height of the line its arrow points at ("to": "sheet:3" or "sheet:3-5"). */
+.sheet .q { margin:12px 0 28px; color:var(--ink); overflow-x:auto; overflow-y:hidden; }
+.sheet .q .katex-display { margin:0; text-align:left; } .sheet .q .katex-display > .katex { text-align:left; }
+body:not(.list) .zg > .sheet { min-width:var(--sheet-min, 976px); }
+body:not(.list) .sheet .eq, body:not(.list) .sheet .q { overflow:visible; }
+body:not(.list) .sheet > .ti, body:not(.list) .sheet > .bd { width:0; min-width:100%; }   /* text wraps; only the calculation sets the width */
+.sheet .sb { position:relative; display:flex; gap:28px; align-items:flex-start; }
+.sheet .sb .eq { flex:1; min-width:0; margin-top:0; }
+.sheet .eq .katex-display { margin:.45em 0; } .sheet .eq .katex, .sheet .q .katex { font-size:1.55em; }
+.sheet .eq .kh { font-size:15.5px; margin-top:24px; }
+.eq .kh { font-size:13px; font-weight:700; letter-spacing:.04em; color:var(--cy); margin:22px 0 2px; } .eq .kh:first-child { margin-top:0; }
+.eq .ln { position:relative; }
+.sheet .figs { position:relative; flex:none; width:380px; }
+.sheet .figs .fig { position:absolute; left:0; right:0; margin:0; }
+.side { position:relative; grid-column:1; grid-row:1; }
+.side > .card { position:absolute; left:0; right:0; }
+.side > .card .ti { font-size:17px; }
+.side > .card .eq { margin-top:6px; } .side > .card .eq .katex { font-size:1.18em; }
+path.l.br { marker-end:none; }
+.lnref { display:none; }
+.list .side { order:2; height:auto !important; display:flex; flex-direction:column; gap:14px; }   /* list: the sheet first, then its descriptions */
+.list .side > .card { position:static; }
+.list .sheet, .list .side { align-self:stretch; }   /* full width; a long formula scrolls inside its line instead of widening the page */
+.list .sheet .sb { display:block; }
+@media (max-width:700px) { .list .sheet .eq .katex, .list .sheet .q .katex { font-size:1.12em; } } .list .sheet .figs { width:auto; height:auto !important; } .list .sheet .figs .fig { position:static; margin-top:12px; }
+.list .sheet .eq .ln { display:flex; align-items:center; gap:10px; }
+.list .sheet .eq .ln::before { content:attr(data-n); }
+.list .sheet .eq .ln::before, .list .lnref { flex:none; display:inline-grid; place-items:center; min-width:1.7em; height:1.7em; padding:0 .35em; border:1.5px solid var(--cy-l); border-radius:999px; color:var(--cy); font-size:11px; font-weight:700; }
+.list .lnref { margin-right:.5em; vertical-align:.15em; }
 
 /* connectors */
 #links { position:absolute; left:0; top:0; overflow:visible; pointer-events:none; z-index:1; }
@@ -1281,7 +1312,11 @@ const Z = {}, C = {};
 D.zones.forEach((z, i) => { z.i = i; Z[z.id] = z; });
 D.cards.forEach(c => { C[c.id] = c; });
 const OUT = {}, INN = {};
-(D.links || []).forEach(l => { (OUT[l.from] = OUT[l.from] || []).push(l); (INN[l.to] = INN[l.to] || []).push(l); });
+(D.links || []).forEach(l => {
+  const m = /^([\w-]+):(\d+)(?:-(\d+))?$/.exec(l.to);   // "sheet:3" / "sheet:3-5": the arrow ends at those lines of the sheet
+  if (m) { l.to = m[1]; l.ln = [+m[2], +(m[3] || m[2])]; }
+  (OUT[l.from] = OUT[l.from] || []).push(l); (INN[l.to] = INN[l.to] || []).push(l);
+});
 const plain = t => String(t == null ? "" : t).replace(/(\d+)/g, (_, i) => D.math[i].s).replace(/\*\*/g, "").replace(/\[\[[\w-]+\|(.+?)\]\]/g, "$1");
 
 /* ---------- DOM ---------- */
@@ -1295,25 +1330,63 @@ D.zones.forEach(z => {
 });
 D.cards.forEach(c => {
   const el = c.el = document.createElement("article");
-  el.className = "card k-" + (c.k || "c"); el.id = c.id; el.dataset.id = c.id;
+  el.className = "card k-" + (c.k || "c") + (c.sheet ? " sheet" : ""); el.id = c.id; el.dataset.id = c.id;
   if (c.col) el.style.gridColumn = `${c.col} / span ${c.span || 1}`;
   if (c.row) el.style.gridRow = c.row;
+  let n = 0;
+  const eq = c.eq ? `<div class="eq">${c.eq.map(t => t[0] === "#" ? `<div class="kh">${md(t.slice(1))}</div>`
+    : `<div${c.sheet ? ` class="ln" data-n="${++n}"` : ""}>${tex(t)}</div>`).join("")}</div>` : "";
   el.innerHTML = `<i class="bar"></i><div class="ty">${esc(c.ty || "")}</div>` +
     (c.n ? `<div class="n">${esc(c.n)}</div>` : "") +
     `<h3 class="ti">${md(c.title)}</h3>` +
+    (c.q ? `<div class="q">${tex(c.q)}</div>` : "") +
     (c.body ? `<div class="bd">${md(c.body)}</div>` : "") +
-    (c.eq ? `<div class="eq">${c.eq.map(t => `<div>${tex(t)}</div>`).join("")}</div>` : "") +
+    (c.figs ? `<div class="sb">${eq}<div class="figs">${c.figs.map(f => `<div class="fig" data-at="${f.at}">${f.svg}</div>`).join("")}</div></div>` : eq) +
     (c.svg ? `<div class="fig">${c.svg}</div>` : "") +
     (c.a ? `<button class="rev" type="button">Pokaż odpowiedź</button><div class="ans bd">${md(c.a)}</div>` : "") +
     `<div class="ft"></div>`;
   Z[c.z].g.appendChild(el);
 });
+// a zone with a sheet: the sheet takes the right columns, every other card of the zone goes into .side (column 1), in data order
+D.cards.filter(c => c.sheet).forEach(s => {
+  const z = Z[s.z], side = z.side = document.createElement("div"); side.className = "side";
+  // the sheet is as wide as its longest line needs (never a scrollbar on the board), at least the width of the columns it used to span
+  z.g.style.gridTemplateColumns = "440px max-content"; z.g.style.setProperty("--sheet-min", `${((z.cols || 3) - 1) * 440 + ((z.cols || 3) - 2) * 96}px`);
+  s.el.style.gridColumn = "2"; s.el.style.gridRow = "1";
+  D.cards.filter(c => c.z === s.z && c !== s).forEach(c => side.appendChild(c.el));
+  z.g.insertBefore(side, z.g.firstChild); z.sheet = s;
+});
+(D.links || []).forEach(l => { if (l.ln && C[l.from]) C[l.from].el.querySelector(".ti").insertAdjacentHTML("afterbegin",
+  `<span class="lnref">${l.ln[0]}${l.ln[1] !== l.ln[0] ? "–" + l.ln[1] : ""}</span>`); });   // list mode: no arrows, the line number says where it belongs
 $("#bottom").innerHTML = (D.nav || []).map((n, i) => `<button class="ni" type="button" data-i="${i}">${svg(n.icon)}<span>${esc(n.label)}</span></button>`).join("");
 
 /* ---------- layout: zones on a grid of cells, like frames on a Miro board ---------- */
 let W = 0, H = 0;
 const pos = el => { let x = 0, y = 0; for (let e = el; e && e !== stage; e = e.offsetParent) { x += e.offsetLeft; y += e.offsetTop; } return { x, y }; };
+const lineEl = (c, n) => c.el.querySelector(`.ln[data-n="${n}"]`);
+// stack absolutely placed boxes in a column, each as close to its wanted top as it can be without overlapping the one above
+function stack(box, items, gap) {
+  let bottom = 0;
+  items.forEach(([el, want], i) => { const top = Math.max(want == null ? 0 : want, i ? bottom + gap : 0); el.style.top = top + "px"; bottom = top + el.offsetHeight; });
+  box.style.height = bottom + "px";
+}
+// The sheet stays compact (the calculation is never stretched); each description goes as close to the height of its lines as the one
+// above it allows, and its arrow winds to the exact line.
+function placeSheets() {
+  D.zones.forEach(z => {
+    const s = z.sheet; if (!s) return;
+    const top = pos(z.side).y;
+    stack(z.side, [...z.side.children].map(el => {
+      const l = (OUT[el.dataset.id] || []).find(l => l.to === s.id && l.ln);
+      const a = l && lineEl(s, l.ln[0]), b = l && lineEl(s, l.ln[1]);
+      return [el, a && b ? (pos(a).y + pos(b).y + b.offsetHeight) / 2 - top - el.offsetHeight / 2 : null];
+    }), 18);
+    const figs = $(".figs", s.el);
+    if (figs) stack(figs, [...figs.children].map(f => { const l = lineEl(s, f.dataset.at); return [f, l ? l.offsetTop : null]; }), 12);
+  });
+}
 function layout() {
+  placeSheets();
   const cw = {}, rh = {};
   D.zones.forEach(z => { z.w = z.el.offsetWidth; z.h = z.el.offsetHeight; const gx = z.gx || 0, gy = z.gy || 0;
     cw[gx] = Math.max(cw[gx] || 0, z.w); rh[gy] = Math.max(rh[gy] || 0, z.h); });
@@ -1328,7 +1401,14 @@ function draw() {
     const a = C[l.from], b = C[l.to]; if (!a || !b) return;
     const pa = pos(a.el), pb = pos(b.el), A = { ...pa, w: a.el.offsetWidth, h: a.el.offsetHeight }, B = { ...pb, w: b.el.offsetWidth, h: b.el.offsetHeight };
     let p0, p1, vert = true;
-    if (B.y >= A.y + A.h - 4) { p0 = [A.x + A.w / 2, A.y + A.h]; p1 = [B.x + B.w / 2, B.y]; }
+    if (l.ln) {   // to lines of a sheet: horizontal, ends on the sheet's left edge at the height of those lines; a range gets a bracket
+      const la = lineEl(b, l.ln[0]), lb = lineEl(b, l.ln[1]); if (!la || !lb) return;
+      const y0 = pos(la).y, y1 = pos(lb).y + lb.offsetHeight, x = B.x - 4;
+      vert = false; p0 = [A.x + A.w, A.y + A.h / 2]; p1 = [x - (l.ln[1] !== l.ln[0] ? 10 : 0), (y0 + y1) / 2];
+      if (l.ln[1] !== l.ln[0]) { const br = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        br.setAttribute("class", "l br"); br.setAttribute("d", `M${x},${y0 + 4} H${x - 10} V${y1 - 4} H${x}`); br.dataset.f = l.from; br.dataset.t = l.to; paths.appendChild(br); }
+    }
+    else if (B.y >= A.y + A.h - 4) { p0 = [A.x + A.w / 2, A.y + A.h]; p1 = [B.x + B.w / 2, B.y]; }
     else if (A.y >= B.y + B.h - 4) { p0 = [A.x + A.w / 2, A.y]; p1 = [B.x + B.w / 2, B.y + B.h]; }
     else { vert = false; if (B.x > A.x) { p0 = [A.x + A.w, A.y + A.h / 2]; p1 = [B.x, B.y + B.h / 2]; } else { p0 = [A.x, A.y + A.h / 2]; p1 = [B.x + B.w, B.y + B.h / 2]; } }
     const i = vert ? 1 : 0, s = Math.sign(p1[i] - p0[i]) || 1, d = Math.max(40, Math.abs(p1[i] - p0[i]) / 2) * s;
@@ -1336,7 +1416,7 @@ function draw() {
     const p = document.createElementNS("http://www.w3.org/2000/svg", "path");
     p.setAttribute("class", "l"); p.setAttribute("d", `M${p0} C${c0} ${c1} ${p1}`); p.dataset.f = l.from; p.dataset.t = l.to; paths.appendChild(p);
     const mx = (p0[0] + 3 * c0[0] + 3 * c1[0] + p1[0]) / 8, my = (p0[1] + 3 * c0[1] + 3 * c1[1] + p1[1]) / 8;
-    pills.insertAdjacentHTML("beforeend", `<span class="pill" data-f="${l.from}" data-t="${l.to}" style="left:${mx}px;top:${my}px">${esc(l.label)}</span>`);
+    if (l.label) pills.insertAdjacentHTML("beforeend", `<span class="pill" data-f="${l.from}" data-t="${l.to}" style="left:${mx}px;top:${my}px">${esc(l.label)}</span>`);
   });
 }
 
