@@ -115,10 +115,12 @@ button { font:inherit; color:inherit; }
 #stage.anim { transition:transform .55s cubic-bezier(.2,.8,.2,1); }
 #view.anim { transition:background-position .55s cubic-bezier(.2,.8,.2,1); }  /* the dots follow the board at a fifth of its speed (parallax) */
 .zone { position:absolute; width:max-content; border:1.5px solid var(--zone-bd); border-radius:38px; padding:28px 28px 32px; }
-.zone::before { content:""; position:absolute; top:0; right:0; bottom:0; left:0; border-radius:inherit; background:var(--zone-bg); z-index:0; }  /* layers: zone bg 0 < links 1 < labels 2 < cards 3 */
+.zone::before { content:""; position:absolute; top:0; right:0; bottom:0; left:0; border-radius:inherit; background:var(--zone-bg); z-index:0; }  /* layers: zone bg 0 < links 1 < cards 3 < labels 4 (placed off the cards by placePills) */
 .zh { position:relative; z-index:3; display:flex; justify-content:space-between; align-items:baseline; gap:24px; margin:0 6px 22px; }
 .zt { font-size:36px; font-weight:700; letter-spacing:-.02em; line-height:1.1; }
 .zs { color:var(--mu); font-size:15px; white-space:nowrap; }
+.zgoal { position:relative; z-index:3; width:0; min-width:100%; margin:-8px 6px 26px; font-size:16px; line-height:1.55; color:var(--soft); }  /* width 0 + min-width: the goal wraps to the zone, never widens it */
+.zgoal b { display:block; font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--cy); margin-bottom:3px; }
 .zg { position:relative; display:grid; grid-template-columns:repeat(var(--cols,2),440px); gap:66px 96px; align-items:start; }  /* room for labelled arrows between cards */
 
 /* cards, like the transaction rows: colored bar, title, right-aligned time */
@@ -207,10 +209,14 @@ path.l.br { marker-end:none; }
 path.l { fill:none; stroke:var(--link); stroke-width:2; marker-end:url(#ah); }
 path.l.on { stroke:var(--cy); stroke-width:3; }
 .has-sel path.l:not(.on), .has-sel .pill:not(.on) { opacity:.22; }
-.pill { z-index:2; position:absolute; transform:translate(-50%,-50%); background:var(--pill-bg); border:1px solid var(--cy-l); color:var(--cy); font-size:12px; padding:1px 9px; border-radius:999px; white-space:nowrap; pointer-events:none; }
+.pill.wrap { white-space:normal; width:max-content; max-width:84px; text-align:center; line-height:1.25; padding:3px 6px; border-radius:10px; }
+.pill { z-index:4; position:absolute; transform:translate(-50%,-50%); background:var(--pill-bg); border:1px solid var(--cy-l); color:var(--cy); font-size:12px; padding:1px 9px; border-radius:999px; white-space:nowrap; pointer-events:none; }
 
 /* controls */
-#ctrl { position:fixed; z-index:6; right:14px; bottom:calc(env(safe-area-inset-bottom) + 98px); display:flex; flex-direction:column; gap:8px; }
+#ctrl { position:fixed; z-index:6; right:14px; bottom:calc(env(safe-area-inset-bottom) + 98px); display:flex; flex-direction:column; align-items:flex-end; gap:8px; }
+#deck { display:flex; align-items:center; gap:7px; height:40px; padding:0 15px 0 12px; border-radius:999px; border:1.5px solid var(--chip-bd); background:var(--chip-bg); color:inherit; text-decoration:none; font-size:13px; font-weight:700; }
+#deck:hover { border-color:var(--cy); color:var(--cy); }
+#deck svg { width:19px; height:19px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
 #ctrl .rb { width:40px; height:40px; }
 #bottom { position:fixed; z-index:6; left:12px; right:12px; bottom:calc(env(safe-area-inset-bottom) + 12px); max-width:640px; margin:0 auto; display:flex; gap:4px; padding:6px;
   background:var(--nav-bg); border:1px solid var(--nav-bd); border-radius:30px; }
@@ -251,7 +257,7 @@ html.js-ok body.list { overflow:auto; height:auto; }
 .list .zs { white-space:normal; }
 .list .zg { display:flex; flex-direction:column; gap:14px; }
 .list .card { grid-column:auto !important; grid-row:auto !important; }
-.list #links, .list #pills, .list #ctrl { display:none; }
+.list #links, .list #pills, .list #ctrl .rb { display:none; }  /* list mode keeps only the flashcard button */
 @media (max-width:520px) { .zt { font-size:30px; } }
 </style>
 </head>
@@ -264,6 +270,7 @@ html.js-ok body.list { overflow:auto; height:auto; }
 </defs></svg>
 <div id="fallback"><h1>Telefony komórkowe 2002–2003</h1>
 <p class="fb-note">Wersja uproszczona: ten widok otwiera się bez JavaScriptu (np. w podglądzie komunikatora). Żeby zobaczyć interaktywną tablicę ze strzałkami, otwórz plik w przeglądarce (Chrome, Safari, Edge).</p>
+
 <p class="fb-nav"><a href="#fb-z-start">1. Wielki obraz</a> <a href="#fb-z-se">2. Sony Ericsson T68i</a> <a href="#fb-z-sam">3. Samsung SGH-T100</a> <a href="#fb-z-bb">4. BlackBerry 6210</a> <a href="#fb-z-nok">5. Nokia 1100</a> <a href="#fb-z-rozw">6. Rozwinięcie tematu</a> <a href="#fb-z-quiz">7. Sprawdź się</a></p>
 <section id="fb-z-start"><h2>1. Wielki obraz<small>trzy kierunki rozwoju telefonu</small></h2>
 <article id="fb-st-big" class="fb-c"><p class="fb-m">Wielki obraz</p>
@@ -450,6 +457,7 @@ html.js-ok body.list { overflow:auto; height:auto; }
   <button class="rb" id="zi" type="button" aria-label="Przybliż">+</button>
   <button class="rb" id="zo" type="button" aria-label="Oddal">−</button>
   <button class="rb" id="fit" type="button" aria-label="Mapa sekcji"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+  
 </div>
 <nav id="bottom" aria-label="Sekcje"></nav>
 <aside id="legend" aria-label="Sterowanie tablicą">
@@ -503,7 +511,7 @@ $("#sub").textContent = D.sub || "";
 D.zones.forEach(z => {
   z.el = document.createElement("section");
   z.el.className = "zone"; z.el.id = z.id;
-  z.el.innerHTML = `<div class="zh"><span class="zt"><i class="zn">${z.i + 1}</i>${esc(z.title)}</span><span class="zs">${esc(z.sub || "")}</span></div><div class="zg" style="--cols:${z.cols || 2}"></div>`;
+  z.el.innerHTML = `<div class="zh"><span class="zt"><i class="zn">${z.i + 1}</i>${esc(z.title)}</span><span class="zs">${esc(z.sub || "")}</span></div>${z.goal ? `<p class="zgoal"><b>Po tej sekcji umiesz</b>${md(z.goal)}</p>` : ""}<div class="zg" style="--cols:${z.cols || 2}"></div>`;
   stage.appendChild(z.el); z.g = $(".zg", z.el);
 });
 D.cards.forEach(c => {
@@ -593,8 +601,36 @@ function draw() {
     const c0 = p0.slice(), c1 = p1.slice(); c0[i] += d; c1[i] -= d;
     const p = document.createElementNS("http://www.w3.org/2000/svg", "path");
     p.setAttribute("class", "l"); p.setAttribute("d", `M${p0} C${c0} ${c1} ${p1}`); p.dataset.f = l.from; p.dataset.t = l.to; paths.appendChild(p);
-    const mx = (p0[0] + 3 * c0[0] + 3 * c1[0] + p1[0]) / 8, my = (p0[1] + 3 * c0[1] + 3 * c1[1] + p1[1]) / 8;
-    if (l.label) pills.insertAdjacentHTML("beforeend", `<span class="pill" data-f="${l.from}" data-t="${l.to}" style="left:${mx}px;top:${my}px">${esc(l.label)}</span>`);
+    if (!l.label) return;
+    const pill = document.createElement("span"); pill.className = "pill"; pill.dataset.f = l.from; pill.dataset.t = l.to; pill.textContent = l.label;
+    pills.appendChild(pill); pill.curve = [p0, c0, c1, p1]; pill.zone = a.z;
+  });
+  placePills();
+}
+/* a label sits on its arrow at the first point (from the middle outwards) where it covers no card; labels are drawn above the cards,
+   so when no point is free (a label wider than the gap between columns) it overlaps only the least card area, mostly the card's padding */
+function placePills() {
+  const boxes = {};
+  D.cards.forEach(c => { const p = pos(c.el); (boxes[c.z] = boxes[c.z] || []).push([p.x, p.y, p.x + c.el.offsetWidth, p.y + c.el.offsetHeight]); });
+  const find = (p, w, h) => {
+    const [P0, C0, C1, P1] = p.curve; let best = null;
+    for (const t of [.5, .42, .58, .34, .66, .26, .74, .18, .82]) {
+      const u = 1 - t, at = i => u * u * u * P0[i] + 3 * u * u * t * C0[i] + 3 * u * t * t * C1[i] + t * t * t * P1[i];
+      const x = at(0), y = at(1);
+      const hit = (boxes[p.zone] || []).reduce((s, b) => s + Math.max(0, Math.min(x + w / 2, b[2]) - Math.max(x - w / 2, b[0])) * Math.max(0, Math.min(y + h / 2, b[3]) - Math.max(y - h / 2, b[1])), 0);
+      if (!best || hit < best[2]) best = [x, y, hit];
+      if (!hit) break;
+    }
+    return best;
+  };
+  const all = [...pills.children], first = all.map(p => [p.offsetWidth, p.offsetHeight]).map((s, n) => find(all[n], ...s));   // one layout read for all labels
+  const tight = all.filter((p, n) => first[n][2] > 0);
+  tight.forEach(p => p.classList.add("wrap"));   // no free point: try the label wrapped narrow enough for the gap between columns
+  const wrapped = tight.map(p => find(p, p.offsetWidth, p.offsetHeight));
+  all.forEach((p, n) => {
+    let b = first[n]; const k = tight.indexOf(p);
+    if (k >= 0) { if (wrapped[k][2] < b[2]) b = wrapped[k]; else p.classList.remove("wrap"); }
+    p.style.left = b[0] + "px"; p.style.top = b[1] + "px";
   });
 }
 
