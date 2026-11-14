@@ -1,0 +1,683 @@
+<!doctype html>
+<html lang="pl">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Zespolone z tablicy</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Kalam:wght@400;700&display=swap">
+<style>
+/* Layout: one notebook sheet (kratka), tasks stacked top to bottom, red task labels, orange margin notes, boxed results */
+:root{
+  --paper:#f7f6ee; --grid:#dcdcd2; --ink:#1f2328; --red:#d0453a; --hl:#e9a39b;
+  --orange:#d97a0b; --green:#9fe08a; --box:#c9506a; --muted:#6b6f68; --theory:#eef3fb;
+  --hand:"Kalam","Comic Sans MS",cursive; --note:"Caveat","Segoe Print",cursive;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#1d2123; --grid:#2c3234; --ink:#e9ebe6; --red:#ff7a6e; --hl:#7a3a35;
+  --orange:#ffad4d; --green:#3f7a35; --box:#ff8aa3; --muted:#9aa19a; --theory:#232a33; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#1d2123; --grid:#2c3234; --ink:#e9ebe6; --red:#ff7a6e; --hl:#7a3a35;
+  --orange:#ffad4d; --green:#3f7a35; --box:#ff8aa3; --muted:#9aa19a; --theory:#232a33; color-scheme:dark}
+
+body{
+  margin:0;
+  background-color:var(--paper);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:26px 26px;
+  color:var(--ink); font-family:var(--hand); font-size:19px; line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px)); padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:24px 64px;
+}
+.sheet{max-width:780px;margin:0 auto;display:flex;flex-direction:column;gap:36px}
+.back{font-family:var(--note);font-size:1.3rem;color:var(--muted);text-decoration:none}
+h1{font-family:var(--hand);font-weight:700;font-size:1.7rem;margin:0;line-height:1.3;text-wrap:balance}
+h1 span{background:linear-gradient(100deg,transparent 1%,var(--hl) 3%,var(--hl) 97%,transparent 99%);padding:0 .3em;border-bottom:2px solid var(--ink)}
+.meta{font-family:var(--note);font-size:1.25rem;color:var(--muted);margin-top:6px}
+.toc{display:flex;flex-wrap:wrap;gap:8px 10px;margin-top:14px}
+.toc a{color:var(--ink);text-decoration:none;font-weight:700;background:var(--green);padding:0 .5em;border-radius:40% 50% 45% 55%}
+.toc a:focus-visible,.back:focus-visible,summary:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+
+h2{margin:0;font-size:1.35rem;font-weight:700;display:flex;flex-wrap:wrap;align-items:baseline;gap:.4em;text-wrap:balance}
+h2 .tag{background:var(--green);padding:0 .4em;border-radius:40% 50% 45% 55%}
+.group{display:flex;flex-direction:column;gap:30px}
+
+section{display:flex;flex-direction:column;gap:12px;min-width:0}
+.label{font-family:var(--note);font-weight:700;font-size:1.9rem;color:var(--red);line-height:1}
+.task{font-weight:700}
+.theory{background:var(--theory);border:2px dashed var(--grid);border-radius:6px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.theory .label{font-size:1.6rem}
+
+.math{display:inline-flex;align-items:center;flex-wrap:wrap;gap:0 .25em}
+.fr{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1.25;margin:0 .1em}
+.fr>span:last-child{border-top:2px solid currentColor;padding-top:1px;min-width:1.2em;text-align:center}
+.ov{border-top:2px solid currentColor;padding-top:1px}
+.ix{font-size:.65em;vertical-align:.9em;margin-right:-.3em}
+.sys{display:inline-flex;align-items:center;gap:.3em}
+.sys .brace{font-size:3.2em;line-height:1;font-weight:400;transform:scaleX(.6)}
+.sys .lines{display:flex;flex-direction:column;gap:4px}
+.ok{color:var(--muted);text-decoration:line-through}
+
+.step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.8fr);gap:4px 20px;align-items:center;break-inside:avoid}
+.note{font-family:var(--note);font-size:1.35rem;color:var(--orange);line-height:1.2}
+.step>.note::before{content:"← "}
+@media (max-width:560px){.step{grid-template-columns:minmax(0,1fr)}.step>.note::before{content:"↳ "}}
+
+.result{display:inline-block;border:2.5px solid var(--box);padding:6px 14px;border-radius:3px;font-weight:700;font-size:1.1em}
+.check{font-family:var(--note);font-size:1.35rem;color:var(--orange)}
+
+figure{margin:0;display:flex;flex-direction:column;gap:2px;align-items:flex-start;break-inside:avoid}
+figure svg{width:100%;max-width:280px;height:auto}
+figcaption{font-family:var(--note);color:var(--muted);font-size:1.15rem}
+svg text{font-family:var(--hand);fill:var(--ink);font-size:13px}
+svg .ax{stroke:var(--ink);stroke-width:1.6;fill:none}
+svg .vec{stroke:var(--ink);stroke-width:2;fill:none}
+svg .dash{stroke:var(--muted);stroke-width:1.2;stroke-dasharray:4 4;fill:none}
+svg .circ{stroke:var(--muted);stroke-width:1.2;fill:none}
+svg .arc{stroke:var(--red);stroke-width:1.8;fill:none}
+svg .arcO{stroke:var(--orange);stroke-width:1.8;fill:none}
+svg .tR{fill:var(--red)} svg .tO{fill:var(--orange)} svg .tM{fill:var(--muted)}
+svg .dot{fill:var(--ink)} svg .dotR{fill:var(--red)}
+
+.cols{display:flex;flex-wrap:wrap;gap:18px 36px;align-items:center}
+.cols>*{min-width:0}
+.stack{display:flex;flex-direction:column;gap:10px;min-width:0}
+table{border-collapse:collapse;font-size:1rem}
+td,th{padding:2px 14px 2px 0;text-align:left;font-weight:400}
+th{font-family:var(--note);color:var(--muted);font-size:1.15rem}
+td:first-child{color:var(--red);font-weight:700}
+hr{border:0;border-top:2px dashed var(--grid);margin:0;width:100%}
+
+.hw{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,330px),1fr));gap:14px}
+.hw>div{display:flex;flex-direction:column;gap:4px;min-width:0;break-inside:avoid}
+.hw .label{font-size:1.5rem}
+details{font-family:var(--note);font-size:1.3rem;color:var(--orange)}
+summary{cursor:pointer;color:var(--muted)}
+details .math{font-family:var(--hand);font-size:1rem;color:var(--ink)}
+
+@page{size:A4;margin:10mm 12mm}
+@media print{
+  body{font-size:15px;padding-block:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .toc,.back{display:none}
+  .sheet{gap:18px;max-width:none}
+  .group{gap:16px}
+  section{gap:6px}
+  .cols{flex-wrap:nowrap;gap:12px 28px}
+  figure svg{max-width:190px}
+  .theory{padding:10px 12px;gap:6px}
+  .label,.task,h2{break-after:avoid}
+  .result,.check{break-before:avoid}
+}
+</style>
+
+<div class="sheet">
+  <header>
+    <a class="back" href="../index.html">← Matematyka 1</a>
+    <h1><span>Zestaw nr 2 – liczby zespolone</span></h1>
+    <div class="meta">rozwiązania z tablicy · 14.11.2026</div>
+    <nav class="toc" aria-label="Spis treści">
+      <a href="#zad2">zad. 2</a><a href="#zad3">zad. 3</a><a href="#zad4">zad. 4</a><a href="#zad5">zad. 5</a><a href="#dom">do domu</a>
+    </nav>
+  </header>
+
+  <!-- ================= ZAD 2 ================= -->
+  <div class="group" id="zad2">
+    <h2><span class="tag">zad. 2</span>Postać trygonometryczna</h2>
+
+    <div class="theory">
+      <div class="label">teoria</div>
+      <div class="cols">
+        <div class="stack">
+          <div class="math">z = |z| (cos φ + i sin φ)</div>
+          <div class="math">|z| = √<span class="ov">x² + y²</span></div>
+          <div class="sys"><span class="brace">{</span><span class="lines">
+            <span class="math">cos φ = <span class="fr"><span>x</span><span>|z|</span></span></span>
+            <span class="math">sin φ = <span class="fr"><span>y</span><span>|z|</span></span></span>
+          </span></div>
+          <div class="note" style="max-width:22em">|z| to długość strzałki, φ to kąt od dodatniej osi Re (przeciwnie do wskazówek zegara)</div>
+        </div>
+        <figure>
+          <svg viewBox="0 0 200 150" role="img" aria-label="Liczba z = x + iy na płaszczyźnie: długość |z|, kąt φ od osi Re">
+            <line class="ax" x1="10" y1="120" x2="190" y2="120"/><path class="ax" d="M182 115 L190 120 L182 125"/>
+            <line class="ax" x1="50" y1="140" x2="50" y2="10"/><path class="ax" d="M45 18 L50 10 L55 18"/>
+            <text x="176" y="138">Re</text><text x="56" y="20">Im</text>
+            <line class="vec" x1="50" y1="120" x2="150" y2="45"/><circle class="dot" cx="150" cy="45" r="3"/>
+            <line class="dash" x1="150" y1="45" x2="150" y2="120"/><line class="dash" x1="150" y1="45" x2="50" y2="45"/>
+            <text x="118" y="38">z = x + iy</text>
+            <text x="140" y="134">x</text><text x="38" y="49">y</text>
+            <text x="82" y="78">|z|</text>
+            <path class="arc" d="M80 120 A30 30 0 0 0 74 102"/>
+            <text class="tR" x="84" y="113">φ</text>
+          </svg>
+        </figure>
+      </div>
+      <div class="cols">
+        <figure>
+          <svg viewBox="0 0 220 170" role="img" aria-label="Znaki funkcji trygonometrycznych w ćwiartkach">
+            <line class="ax" x1="10" y1="85" x2="210" y2="85"/><path class="ax" d="M202 80 L210 85 L202 90"/>
+            <line class="ax" x1="110" y1="160" x2="110" y2="8"/><path class="ax" d="M105 16 L110 8 L115 16"/>
+            <text class="tR" x="160" y="30" style="font-weight:700">I</text><text x="140" y="50">wszystkie +</text>
+            <text class="tR" x="52" y="30" style="font-weight:700">II</text><text x="40" y="50">sin +</text>
+            <text class="tR" x="48" y="118" style="font-weight:700">III</text><text x="30" y="138">tg, ctg +</text>
+            <text class="tR" x="158" y="118" style="font-weight:700">IV</text><text x="148" y="138">cos +</text>
+          </svg>
+          <figcaption>który znak jest dodatni w której ćwiartce</figcaption>
+        </figure>
+        <div class="stack">
+          <table>
+            <tr><th>ćwiartka</th><th>kąt φ</th></tr>
+            <tr><td>I</td><td>φ = α</td></tr>
+            <tr><td>II</td><td>φ = π − α</td></tr>
+            <tr><td>III</td><td>φ = π + α</td></tr>
+            <tr><td>IV</td><td>φ = 2π − α</td></tr>
+          </table>
+          <div class="note" style="max-width:20em">α to kąt ostry między strzałką a osią Re. Ćwiartkę poznajesz po znakach x i y.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2c -->
+    <section class="task-block">
+      <div class="label">2c</div>
+      <div class="task">z = −6 + 6i</div>
+      <div class="step">
+        <div class="math">x = −6, &nbsp; y = 6</div>
+        <div class="note">część rzeczywista i urojona</div>
+      </div>
+      <div class="step">
+        <div class="math">|z| = √<span class="ov">(−6)² + 6²</span> = √<span class="ov">36 + 36</span> = √<span class="ov">72</span> = 6√2</div>
+        <div class="note">√72 = √(36·2) = 6√2</div>
+      </div>
+      <div class="step">
+        <div class="sys"><span class="brace">{</span><span class="lines">
+          <span class="math">cos φ = <span class="fr"><span>−6</span><span>6√2</span></span> = −<span class="fr"><span>√2</span><span>2</span></span></span>
+          <span class="math">sin φ = <span class="fr"><span>6</span><span>6√2</span></span> = <span class="fr"><span>√2</span><span>2</span></span></span>
+        </span></div>
+        <div class="note">skracamy 6, a <span class="fr"><span>1</span><span>√2</span></span> = <span class="fr"><span>√2</span><span>2</span></span> (usuwamy niewymierność)</div>
+      </div>
+      <div class="cols">
+        <figure>
+          <svg viewBox="0 0 220 190" role="img" aria-label="z = −6 + 6i w drugiej ćwiartce, kąt φ = 135°, α = 45°">
+            <line class="ax" x1="10" y1="140" x2="210" y2="140"/><path class="ax" d="M202 135 L210 140 L202 145"/>
+            <line class="ax" x1="140" y1="182" x2="140" y2="8"/><path class="ax" d="M135 16 L140 8 L145 16"/>
+            <text x="196" y="158">Re</text><text x="146" y="18">Im</text>
+            <line class="dash" x1="50" y1="50" x2="50" y2="140"/><line class="dash" x1="50" y1="50" x2="140" y2="50"/>
+            <line class="vec" x1="140" y1="140" x2="50" y2="50"/><circle class="dot" cx="50" cy="50" r="3.2"/>
+            <text x="22" y="40">z = −6 + 6i</text>
+            <text x="40" y="158">−6</text><text x="146" y="54">6</text>
+            <text x="66" y="104">6√2</text>
+            <path class="arc" d="M168 140 A28 28 0 0 0 120.2 120.2"/>
+            <text class="tR" x="160" y="118">φ</text>
+            <path class="arcO" d="M100 140 A40 40 0 0 1 111.7 111.7"/>
+            <text class="tO" x="86" y="132">α</text>
+          </svg>
+          <figcaption>x &lt; 0, y &gt; 0, więc II ćwiartka</figcaption>
+        </figure>
+        <div class="stack">
+          <div class="math">cos φ &lt; 0, sin φ &gt; 0 → II ćwiartka</div>
+          <div class="math">φ = π − <span class="fr"><span>π</span><span>4</span></span> = <span class="fr"><span>3π</span><span>4</span></span></div>
+          <div class="note" style="max-width:19em">α = π/4, bo |cos| = |sin| = √2/2. W stopniach: 90° + 45° = 135°, a 135° · <span class="fr"><span>π</span><span>180°</span></span> = <span class="fr"><span>3π</span><span>4</span></span></div>
+        </div>
+      </div>
+      <div><span class="result math">z = 6√2 ( cos <span class="fr"><span>3π</span><span>4</span></span> + i sin <span class="fr"><span>3π</span><span>4</span></span> )</span></div>
+      <div class="check">sprawdzenie: 6√2 · (−√2/2) = −6 ✓, &nbsp; 6√2 · √2/2 = 6 ✓</div>
+    </section>
+
+    <hr>
+
+    <!-- 2d -->
+    <section class="task-block">
+      <div class="label">2d</div>
+      <div class="task">z = √3 − i &nbsp;→&nbsp; punkt (√3, −1)</div>
+      <div class="step">
+        <div class="math">|z| = √<span class="ov">(√3)² + (−1)²</span> = √<span class="ov">3 + 1</span> = √4 = 2</div>
+        <div class="note">(√3)² = 3</div>
+      </div>
+      <div class="cols">
+        <div class="stack">
+          <div class="sys"><span class="brace">{</span><span class="lines">
+            <span class="math">cos φ = <span class="fr"><span>√3</span><span>2</span></span></span>
+            <span class="math">sin φ = <span class="fr"><span>−1</span><span>2</span></span></span>
+          </span></div>
+          <div class="math">cos &gt; 0, sin &lt; 0 → IV ćwiartka, α = <span class="fr"><span>π</span><span>6</span></span></div>
+          <div class="math">φ = 2π − α = 2π − <span class="fr"><span>π</span><span>6</span></span> = <span class="fr"><span>11π</span><span>6</span></span></div>
+          <div class="note" style="max-width:19em">kąt ostry z cos = √3/2 i sin = 1/2 to 30° = π/6</div>
+        </div>
+        <figure>
+          <svg viewBox="0 0 220 150" role="img" aria-label="z = √3 − i w czwartej ćwiartce, α = π/6, φ = 11π/6">
+            <line class="ax" x1="10" y1="70" x2="210" y2="70"/><path class="ax" d="M202 65 L210 70 L202 75"/>
+            <line class="ax" x1="90" y1="142" x2="90" y2="8"/><path class="ax" d="M85 16 L90 8 L95 16"/>
+            <text x="196" y="88">Re</text><text x="96" y="18">Im</text>
+            <line class="dash" x1="159.3" y1="110" x2="159.3" y2="70"/><line class="dash" x1="159.3" y1="110" x2="90" y2="110"/>
+            <line class="vec" x1="90" y1="70" x2="159.3" y2="110"/><circle class="dot" cx="159.3" cy="110" r="3.2"/>
+            <text x="150" y="62">√3</text><text x="68" y="114">−1</text>
+            <text x="132" y="132">z = √3 − i</text>
+            <text x="112" y="104">2</text>
+            <path class="arcO" d="M125 70 A35 35 0 0 1 120.3 87.5"/>
+            <text class="tO" x="128" y="86">α</text>
+            <path class="arc" d="M106 70 A16 16 0 1 0 103.9 78"/>
+            <text class="tR" x="66" y="56">φ</text>
+          </svg>
+          <figcaption>φ liczymy od osi Re prawie cały obrót</figcaption>
+        </figure>
+      </div>
+      <div><span class="result math">z = 2 ( cos <span class="fr"><span>11π</span><span>6</span></span> + i sin <span class="fr"><span>11π</span><span>6</span></span> )</span></div>
+    </section>
+  </div>
+
+  <!-- ================= ZAD 3 ================= -->
+  <div class="group" id="zad3">
+    <h2><span class="tag">zad. 3</span>Potęgi (wzór de Moivre'a)</h2>
+
+    <div class="theory">
+      <div class="label">teoria</div>
+      <div class="math">z<sup>n</sup> = |z|<sup>n</sup> ( cos(nφ) + i sin(nφ) )</div>
+      <div class="note">moduł podnosimy do potęgi, kąt mnożymy przez n. Potem z nφ odejmujemy pełne obroty 2π, bo cos i sin się nie zmieniają: cos 21π = cos(20π + π) = cos π</div>
+    </div>
+
+    <!-- 3a -->
+    <section class="task-block">
+      <div class="label">3a</div>
+      <div class="task">(1 − i)<sup>12</sup></div>
+      <div class="cols">
+        <div class="stack">
+          <div class="math">z = 1 − i &nbsp;→&nbsp; (1, −1)</div>
+          <div class="math">|z| = √<span class="ov">1² + (−1)²</span> = √2</div>
+          <div class="math">φ = 2π − <span class="fr"><span>π</span><span>4</span></span> = <span class="fr"><span>7π</span><span>4</span></span></div>
+          <div class="note" style="max-width:18em">IV ćwiartka, α = 45°. W stopniach: φ = 315°, a 315° · <span class="fr"><span>π</span><span>180°</span></span> = <span class="fr"><span>7π</span><span>4</span></span></div>
+        </div>
+        <figure>
+          <svg viewBox="0 0 200 140" role="img" aria-label="z = 1 − i w czwartej ćwiartce, φ = 7π/4">
+            <line class="ax" x1="10" y1="65" x2="190" y2="65"/><path class="ax" d="M182 60 L190 65 L182 70"/>
+            <line class="ax" x1="90" y1="132" x2="90" y2="8"/><path class="ax" d="M85 16 L90 8 L95 16"/>
+            <text x="176" y="83">Re</text><text x="96" y="18">Im</text>
+            <line class="dash" x1="130" y1="105" x2="130" y2="65"/><line class="dash" x1="130" y1="105" x2="90" y2="105"/>
+            <line class="vec" x1="90" y1="65" x2="130" y2="105"/><circle class="dot" cx="130" cy="105" r="3.2"/>
+            <text x="126" y="58">1</text><text x="68" y="109">−1</text>
+            <text x="126" y="126">z = 1 − i</text>
+            <path class="arcO" d="M116 65 A26 26 0 0 1 108.4 83.4"/><text class="tO" x="118" y="82">α</text>
+            <path class="arc" d="M104 65 A14 14 0 1 0 99.9 74.9"/><text class="tR" x="68" y="52">φ</text>
+          </svg>
+        </figure>
+      </div>
+      <div class="step">
+        <div class="math">(1 − i)<sup>12</sup> = (√2)<sup>12</sup> ( cos(12 · <span class="fr"><span>7π</span><span>4</span></span>) + i sin(12 · <span class="fr"><span>7π</span><span>4</span></span>) )</div>
+        <div class="note">(√2)<sup>12</sup> = 2<sup>6</sup> = 64</div>
+      </div>
+      <div class="step">
+        <div class="math">= 64 ( cos 21π + i sin 21π ) = 64 ( cos π + i sin π )</div>
+        <div class="note">12 · 7π/4 = 84π/4 = 21π = 20π + π (10 pełnych obrotów)</div>
+      </div>
+      <div class="step">
+        <div class="math">= 64 ( −1 + 0i )</div>
+        <div class="note">cos π = −1, sin π = 0</div>
+      </div>
+      <div><span class="result math">(1 − i)<sup>12</sup> = −64</span></div>
+    </section>
+
+    <hr>
+
+    <!-- 3b -->
+    <section class="task-block">
+      <div class="label">3b</div>
+      <div class="task">(2√3 − 2i)<sup>30</sup></div>
+      <div class="step">
+        <div class="math">|z| = √<span class="ov">(2√3)² + (−2)²</span> = √<span class="ov">12 + 4</span> = √16 = 4</div>
+        <div class="note">(2√3)² = 4 · 3 = 12</div>
+      </div>
+      <div class="step">
+        <div class="sys"><span class="brace">{</span><span class="lines">
+          <span class="math">cos φ = <span class="fr"><span>2√3</span><span>4</span></span> = <span class="fr"><span>√3</span><span>2</span></span></span>
+          <span class="math">sin φ = <span class="fr"><span>−2</span><span>4</span></span> = −<span class="fr"><span>1</span><span>2</span></span></span>
+        </span></div>
+        <div class="note">te same wartości co w 2d, więc ten sam kąt: IV ćwiartka, α = π/6</div>
+      </div>
+      <div class="step">
+        <div class="math">φ = 2π − <span class="fr"><span>π</span><span>6</span></span> = <span class="fr"><span>11π</span><span>6</span></span> &nbsp;⇒&nbsp; z = 4 ( cos <span class="fr"><span>11π</span><span>6</span></span> + i sin <span class="fr"><span>11π</span><span>6</span></span> )</div>
+        <div></div>
+      </div>
+      <div class="step">
+        <div class="math">z<sup>30</sup> = 4<sup>30</sup> ( cos(30 · <span class="fr"><span>11π</span><span>6</span></span>) + i sin(30 · <span class="fr"><span>11π</span><span>6</span></span>) ) = 4<sup>30</sup> ( cos 55π + i sin 55π )</div>
+        <div class="note">30/6 = 5, więc 5 · 11π = 55π</div>
+      </div>
+      <div class="step">
+        <div class="math">= 4<sup>30</sup> ( −1 + 0i )</div>
+        <div class="note">55π = 54π + π (27 obrotów), cos π = −1, sin π = 0</div>
+      </div>
+      <div><span class="result math">(2√3 − 2i)<sup>30</sup> = −4<sup>30</sup> = −2<sup>60</sup></span></div>
+    </section>
+  </div>
+
+  <!-- ================= ZAD 4 ================= -->
+  <div class="group" id="zad4">
+    <h2><span class="tag">zad. 4</span>Pierwiastki</h2>
+
+    <div class="theory">
+      <div class="label">teoria</div>
+      <div class="math">√<span class="ov">z</span> = { w ∈ ℂ : w² = z }</div>
+      <div class="note">w ℂ pierwiastek to zbiór: pierwiastek kwadratowy ma 2 wartości, stopnia n ma n wartości</div>
+      <div><b>Sposób 1, algebraiczny</b> (dla √, gdy z nie ma „ładnego” kąta)</div>
+      <div class="math">√<span class="ov">z</span> = x + iy &nbsp;/ ( )² &nbsp;→&nbsp; z = x² − y² + 2xyi</div>
+      <div class="note">porównujemy części rzeczywiste i urojone: x² − y² = Re z, 2xy = Im z. Pomaga trzecie równanie x² + y² = |z|</div>
+      <div><b>Sposób 2, wzór</b></div>
+      <div class="math"><sup class="ix">n</sup>√<span class="ov">z</span> = { w<sub>0</sub>, w<sub>1</sub>, …, w<sub>n−1</sub> }</div>
+      <div class="math">w<sub>k</sub> = <sup class="ix">n</sup>√<span class="ov">|z|</span> ( cos <span class="fr"><span>φ + 2kπ</span><span>n</span></span> + i sin <span class="fr"><span>φ + 2kπ</span><span>n</span></span> ), &nbsp; k = 0, 1, …, n − 1</div>
+      <div class="note">wszystkie pierwiastki leżą na okręgu o promieniu ⁿ√|z|, co 2π/n (wierzchołki n-kąta foremnego)</div>
+    </div>
+
+    <!-- 4a -->
+    <section class="task-block">
+      <div class="label">4a</div>
+      <div class="task">√<span class="ov">−2i</span></div>
+      <div class="step">
+        <div class="math">√<span class="ov">−2i</span> = x + iy &nbsp;/ ( )²</div>
+        <div class="note">x, y ∈ ℝ</div>
+      </div>
+      <div class="step">
+        <div class="math">−2i = x² + 2xyi + y²i² = x² − y² + 2xyi</div>
+        <div class="note">i² = −1</div>
+      </div>
+      <div class="step">
+        <div class="sys"><span class="brace">{</span><span class="lines">
+          <span class="math">0 = x² − y²</span>
+          <span class="math">−2 = 2xy &nbsp;→&nbsp; xy = −1 &nbsp;→&nbsp; x = −<span class="fr"><span>1</span><span>y</span></span></span>
+        </span></div>
+        <div class="note">po lewej nie ma części rzeczywistej, więc Re = 0; Im = −2</div>
+      </div>
+      <div class="step">
+        <div class="math">0 = (−<span class="fr"><span>1</span><span>y</span></span>)² − y² = <span class="fr"><span>1</span><span>y²</span></span> − y² &nbsp;/ · y² &nbsp;→&nbsp; 0 = 1 − y⁴ &nbsp;→&nbsp; y⁴ = 1</div>
+        <div class="note">y jest rzeczywisty, więc y = 1 albo y = −1</div>
+      </div>
+      <div class="step">
+        <div class="math">
+          <span class="sys"><span class="brace">{</span><span class="lines"><span>y = 1</span><span>x = −1</span></span></span>
+          &nbsp;∨&nbsp;
+          <span class="sys"><span class="brace">{</span><span class="lines"><span>y = −1</span><span>x = 1</span></span></span>
+        </div>
+        <div class="note">x = −1/y</div>
+      </div>
+      <div><span class="result math">√<span class="ov">−2i</span> = { −1 + i, &nbsp;1 − i }</span></div>
+      <div class="check">sprawdzenie: (1 − i)² = 1 − 2i + i² = −2i ✓</div>
+    </section>
+
+    <hr>
+
+    <!-- 4b -->
+    <section class="task-block">
+      <div class="label">4b</div>
+      <div class="task">√<span class="ov">5 − 12i</span></div>
+      <div class="step">
+        <div class="math">w² = 5 − 12i, &nbsp; w = a + bi, &nbsp; a, b ∈ ℝ</div>
+        <div></div>
+      </div>
+      <div class="step">
+        <div class="math">a² + 2abi − b² = 5 − 12i</div>
+        <div class="note">porównujemy: część rzeczywista z rzeczywistą, urojona z urojoną</div>
+      </div>
+      <div class="step">
+        <div class="sys"><span class="brace">{</span><span class="lines">
+          <span class="math">a² − b² = 5</span>
+          <span class="math">2ab = −12 &nbsp;→&nbsp; a = −<span class="fr"><span>6</span><span>b</span></span></span>
+        </span></div>
+        <div></div>
+      </div>
+      <div class="step">
+        <div class="math">(−<span class="fr"><span>6</span><span>b</span></span>)² − b² = 5 &nbsp;→&nbsp; <span class="fr"><span>36</span><span>b²</span></span> − b² = 5 &nbsp;/ · b²</div>
+        <div></div>
+      </div>
+      <div class="step">
+        <div class="math">36 − b⁴ − 5b² = 0 &nbsp;/ · (−1) &nbsp;→&nbsp; t² + 5t − 36 = 0, &nbsp; t = b²</div>
+        <div class="note">równanie dwukwadratowe: podstawiamy t = b²</div>
+      </div>
+      <div class="step">
+        <div class="math">Δ = 25 + 4 · 36 = 169, &nbsp; √Δ = 13 &nbsp;→&nbsp; t<sub>1</sub> = <span class="fr"><span>−5 − 13</span><span>2</span></span> = −9, &nbsp; t<sub>2</sub> = <span class="fr"><span>−5 + 13</span><span>2</span></span> = 4</div>
+        <div></div>
+      </div>
+      <div class="step">
+        <div class="math"><span class="ok">b² = −9</span> &nbsp; b² = 4 &nbsp;→&nbsp; b = 2 ∨ b = −2 &nbsp;→&nbsp; a = −3 ∨ a = 3</div>
+        <div class="note">b² = −9 odpada, bo b ∈ ℝ</div>
+      </div>
+      <div><span class="result math">√<span class="ov">5 − 12i</span> = { −3 + 2i, &nbsp;3 − 2i }</span></div>
+      <div class="check">sprawdzenie: (3 − 2i)² = 9 − 12i − 4 = 5 − 12i ✓</div>
+    </section>
+
+    <hr>
+
+    <!-- 4c -->
+    <section class="task-block">
+      <div class="label">4c</div>
+      <div class="task"><sup class="ix">3</sup>√<span class="ov">8i</span> = { w<sub>0</sub>, w<sub>1</sub>, w<sub>2</sub> }</div>
+      <div class="step">
+        <div class="math">z = 8i, &nbsp; |z| = 8, &nbsp; φ = <span class="fr"><span>π</span><span>2</span></span>, &nbsp; n = 3</div>
+        <div class="note">8i leży na dodatniej osi Im, <sup class="ix">3</sup>√8 = 2</div>
+      </div>
+      <div class="step">
+        <div class="math">w<sub>0</sub> = 2 ( cos <span class="fr"><span>π/2</span><span>3</span></span> + i sin <span class="fr"><span>π/2</span><span>3</span></span> ) = 2 ( cos <span class="fr"><span>π</span><span>6</span></span> + i sin <span class="fr"><span>π</span><span>6</span></span> ) = 2 ( <span class="fr"><span>√3</span><span>2</span></span> + <span class="fr"><span>1</span><span>2</span></span>i ) = √3 + i</div>
+        <div class="note">k = 0</div>
+      </div>
+      <div class="step">
+        <div class="math">w<sub>1</sub> = 2 ( cos <span class="fr"><span>π/2 + 2π</span><span>3</span></span> + i sin <span class="fr"><span>π/2 + 2π</span><span>3</span></span> ) = 2 ( cos <span class="fr"><span>5π</span><span>6</span></span> + i sin <span class="fr"><span>5π</span><span>6</span></span> )</div>
+        <div class="note">k = 1</div>
+      </div>
+      <div class="step">
+        <div class="math">= 2 ( cos(π − <span class="fr"><span>π</span><span>6</span></span>) + i sin(π − <span class="fr"><span>π</span><span>6</span></span>) ) = 2 ( −cos <span class="fr"><span>π</span><span>6</span></span> + i sin <span class="fr"><span>π</span><span>6</span></span> ) = 2 ( −<span class="fr"><span>√3</span><span>2</span></span> + <span class="fr"><span>1</span><span>2</span></span>i ) = −√3 + i</div>
+        <div class="note">wzory redukcyjne, II ćwiartka: cos ujemny, sin dodatni</div>
+      </div>
+      <div class="cols">
+        <div class="stack">
+          <div class="math">w<sub>2</sub> = 2 ( cos <span class="fr"><span>π/2 + 4π</span><span>3</span></span> + i sin <span class="fr"><span>π/2 + 4π</span><span>3</span></span> ) = 2 ( cos <span class="fr"><span>3π</span><span>2</span></span> + i sin <span class="fr"><span>3π</span><span>2</span></span> ) = 2 ( 0 − i ) = −2i</div>
+          <div class="note">k = 2. Tego na tablicy nie było, dopisane dla kompletu</div>
+        </div>
+        <figure>
+          <svg viewBox="0 0 240 200" role="img" aria-label="Trzy pierwiastki z 8i na okręgu o promieniu 2, co 120°">
+            <line class="ax" x1="20" y1="100" x2="220" y2="100"/><path class="ax" d="M212 95 L220 100 L212 105"/>
+            <line class="ax" x1="120" y1="192" x2="120" y2="8"/><path class="ax" d="M115 16 L120 8 L125 16"/>
+            <circle class="circ" cx="120" cy="100" r="60"/>
+            <polygon class="dash" points="171.96,70 68.04,70 120,160"/>
+            <circle class="dotR" cx="171.96" cy="70" r="4"/><circle class="dotR" cx="68.04" cy="70" r="4"/><circle class="dotR" cx="120" cy="160" r="4"/>
+            <text x="178" y="64">w₀ = √3 + i</text><text x="4" y="64">w₁ = −√3 + i</text><text x="128" y="180">w₂ = −2i</text>
+            <text class="tM" x="184" y="114">2</text>
+          </svg>
+          <figcaption>okrąg o promieniu 2, punkty co 120°</figcaption>
+        </figure>
+      </div>
+      <div><span class="result math"><sup class="ix">3</sup>√<span class="ov">8i</span> = { √3 + i, &nbsp;−√3 + i, &nbsp;−2i }</span></div>
+    </section>
+
+    <hr>
+
+    <!-- 4e -->
+    <section class="task-block">
+      <div class="label">4e</div>
+      <div class="task"><sup class="ix">6</sup>√<span class="ov">−64</span> = { w<sub>0</sub>, w<sub>1</sub>, w<sub>2</sub>, w<sub>3</sub>, w<sub>4</sub>, w<sub>5</sub> }</div>
+      <div class="step">
+        <div class="math">x = −64, y = 0, n = 6, &nbsp; |z| = √<span class="ov">(−64)²</span> = 64, &nbsp; φ = π</div>
+        <div class="note">−64 leży na ujemnej osi Re, <sup class="ix">6</sup>√64 = 2</div>
+      </div>
+      <div class="step">
+        <div class="math">w<sub>0</sub> = 2 ( cos <span class="fr"><span>π + 2·0·π</span><span>6</span></span> + i sin <span class="fr"><span>π + 2·0·π</span><span>6</span></span> ) = 2 ( cos <span class="fr"><span>π</span><span>6</span></span> + i sin <span class="fr"><span>π</span><span>6</span></span> ) = 2 ( <span class="fr"><span>√3</span><span>2</span></span> + <span class="fr"><span>1</span><span>2</span></span>i ) = √3 + i</div>
+        <div></div>
+      </div>
+      <div class="step">
+        <div class="math">w<sub>1</sub> = 2 ( cos <span class="fr"><span>π + 2π</span><span>6</span></span> + i sin <span class="fr"><span>π + 2π</span><span>6</span></span> ) = 2 ( cos <span class="fr"><span>π</span><span>2</span></span> + i sin <span class="fr"><span>π</span><span>2</span></span> ) = 2 ( 0 + 1i ) = 2i</div>
+        <div class="note">3π/6 = π/2</div>
+      </div>
+      <div class="step">
+        <div class="math">w<sub>2</sub> = 2 ( cos <span class="fr"><span>π + 4π</span><span>6</span></span> + i sin <span class="fr"><span>π + 4π</span><span>6</span></span> ) = 2 ( cos <span class="fr"><span>5π</span><span>6</span></span> + i sin <span class="fr"><span>5π</span><span>6</span></span> ) = 2 ( −<span class="fr"><span>√3</span><span>2</span></span> + <span class="fr"><span>1</span><span>2</span></span>i ) = −√3 + i</div>
+        <div class="note"><span class="fr"><span>5π</span><span>6</span></span> = π − <span class="fr"><span>π</span><span>6</span></span></div>
+      </div>
+      <div class="cols">
+        <div class="stack">
+          <div class="math">w<sub>3</sub> = −√3 − i &nbsp; (kąt <span class="fr"><span>7π</span><span>6</span></span>)</div>
+          <div class="math">w<sub>4</sub> = −2i &nbsp; (kąt <span class="fr"><span>3π</span><span>2</span></span>)</div>
+          <div class="math">w<sub>5</sub> = √3 − i &nbsp; (kąt <span class="fr"><span>11π</span><span>6</span></span>)</div>
+          <div class="note" style="max-width:17em">co krok dodajemy 2π/6 = π/3, czyli 60°. Pierwiastki tworzą sześciokąt foremny</div>
+        </div>
+        <figure>
+          <svg viewBox="0 0 260 200" role="img" aria-label="Sześć pierwiastków z −64 na okręgu o promieniu 2, co 60°">
+            <line class="ax" x1="30" y1="100" x2="240" y2="100"/><path class="ax" d="M232 95 L240 100 L232 105"/>
+            <line class="ax" x1="130" y1="192" x2="130" y2="8"/><path class="ax" d="M125 16 L130 8 L135 16"/>
+            <circle class="circ" cx="130" cy="100" r="60"/>
+            <polygon class="dash" points="181.96,70 130,40 78.04,70 78.04,130 130,160 181.96,130"/>
+            <circle class="dotR" cx="181.96" cy="70" r="4"/><circle class="dotR" cx="130" cy="40" r="4"/><circle class="dotR" cx="78.04" cy="70" r="4"/>
+            <circle class="dotR" cx="78.04" cy="130" r="4"/><circle class="dotR" cx="130" cy="160" r="4"/><circle class="dotR" cx="181.96" cy="130" r="4"/>
+            <text x="188" y="66">w₀</text><text x="136" y="34">w₁</text><text x="56" y="66">w₂</text>
+            <text x="56" y="144">w₃</text><text x="136" y="178">w₄</text><text x="188" y="144">w₅</text>
+          </svg>
+          <figcaption>okrąg o promieniu 2, punkty co 60°</figcaption>
+        </figure>
+      </div>
+      <div><span class="result math"><sup class="ix">6</sup>√<span class="ov">−64</span> = { √3 + i, &nbsp;2i, &nbsp;−√3 + i, &nbsp;−√3 − i, &nbsp;−2i, &nbsp;√3 − i }</span></div>
+    </section>
+  </div>
+
+  <!-- ================= ZAD 5 ================= -->
+  <div class="group" id="zad5">
+    <h2><span class="tag">zad. 5</span>Równania kwadratowe w ℂ</h2>
+
+    <div class="theory">
+      <div class="label">teoria</div>
+      <div class="math">Δ = b² − 4ac, &nbsp;&nbsp; z<sub>1,2</sub> = <span class="fr"><span>−b ± √Δ</span><span>2a</span></span></div>
+      <div class="note">w ℂ zawsze są dwa rozwiązania (albo jedno podwójne). √Δ liczymy jak w zad. 4. Sprawdzenie ze wzorów Viète'a: z₁ + z₂ = −b/a, z₁ · z₂ = c/a</div>
+    </div>
+
+    <!-- 5a -->
+    <section class="task-block">
+      <div class="label">5a</div>
+      <div class="task">z² − 4z + 13 = 0</div>
+      <div class="step">
+        <div class="math">a = 1, b = −4, c = 13</div>
+        <div></div>
+      </div>
+      <div class="step">
+        <div class="math">Δ = 16 − 4 · 1 · 13 = 16 − 52 = −36</div>
+        <div class="note">Δ &lt; 0, ale w ℂ to nie przeszkadza</div>
+      </div>
+      <div class="step">
+        <div class="math">√Δ = √<span class="ov">−36</span> = √<span class="ov">36i²</span> = { 6i, −6i }</div>
+        <div class="note">−1 = i²</div>
+      </div>
+      <div class="step">
+        <div class="math">z<sub>1</sub> = <span class="fr"><span>4 − 6i</span><span>2</span></span> = 2 − 3i, &nbsp;&nbsp; z<sub>2</sub> = <span class="fr"><span>4 + 6i</span><span>2</span></span> = 2 + 3i</div>
+        <div class="note">przy rzeczywistych współczynnikach rozwiązania są sprzężone</div>
+      </div>
+      <div><span class="result math">z<sub>1</sub> = 2 − 3i, &nbsp; z<sub>2</sub> = 2 + 3i</span></div>
+    </section>
+
+    <hr>
+
+    <!-- 5b -->
+    <section class="task-block">
+      <div class="label">5b</div>
+      <div class="task">z² − (2 + i)z − 1 + 7i = 0</div>
+      <div class="step">
+        <div class="math">a = 1, &nbsp; b = −(2 + i), &nbsp; c = −1 + 7i</div>
+        <div></div>
+      </div>
+      <div class="step">
+        <div class="math">Δ = (2 + i)² − 4(−1 + 7i) = 4 + 4i − 1 + 4 − 28i = 7 − 24i</div>
+        <div class="note">(2 + i)² = 4 + 4i + i² = 3 + 4i</div>
+      </div>
+      <div class="step">
+        <div class="math">√<span class="ov">7 − 24i</span> = x + yi &nbsp;/ ( )² &nbsp;→&nbsp; 7 − 24i = x² + 2xyi − y²</div>
+        <div></div>
+      </div>
+      <div class="step">
+        <div class="sys"><span class="brace">{</span><span class="lines">
+          <span class="math">x² − y² = 7</span>
+          <span class="math">2xy = −24</span>
+          <span class="math">x² + y² = √<span class="ov">7² + (−24)²</span></span>
+        </span></div>
+        <div class="note">trzecie równanie z modułów: |w|² = |Δ|</div>
+      </div>
+      <div class="step">
+        <div class="math">2x² = 7 + √<span class="ov">49 + 576</span> = 7 + √625 = 7 + 25 = 32 &nbsp;→&nbsp; x² = 16</div>
+        <div class="note">dodajemy pierwsze i trzecie równanie, y² się skraca</div>
+      </div>
+      <div class="step">
+        <div class="math">x = 4: 8y = −24 → y = −3 &nbsp;&nbsp;|&nbsp;&nbsp; x = −4: −8y = −24 → y = 3</div>
+        <div class="note">y z równania 2xy = −24</div>
+      </div>
+      <div class="step">
+        <div class="math">√Δ = { 4 − 3i, &nbsp;−4 + 3i }</div>
+        <div></div>
+      </div>
+      <div class="step">
+        <div class="math">z<sub>1</sub> = <span class="fr"><span>(2 + i) − (4 − 3i)</span><span>2</span></span> = <span class="fr"><span>−2 + 4i</span><span>2</span></span> = −1 + 2i</div>
+        <div class="note">−b = 2 + i</div>
+      </div>
+      <div class="step">
+        <div class="math">z<sub>2</sub> = <span class="fr"><span>(2 + i) + (4 − 3i)</span><span>2</span></span> = <span class="fr"><span>6 − 2i</span><span>2</span></span> = 3 − i</div>
+        <div></div>
+      </div>
+      <div><span class="result math">z<sub>1</sub> = −1 + 2i, &nbsp; z<sub>2</sub> = 3 − i</span></div>
+      <div class="check">sprawdzenie: z₁ + z₂ = 2 + i ✓, &nbsp; z₁ · z₂ = −3 + i + 6i − 2i² = −1 + 7i ✓</div>
+    </section>
+
+    <hr>
+
+    <!-- extra -->
+    <section class="task-block">
+      <div class="label">przykład dodatkowy</div>
+      <div class="task">(2 + i)z² − (5 − i)z + 2 − 2i = 0</div>
+      <div class="step">
+        <div class="math">a = 2 + i, &nbsp; b = −(5 − i), &nbsp; c = 2 − 2i</div>
+        <div class="note">tu a ≠ 1, więc na końcu dzielimy przez liczbę zespoloną</div>
+      </div>
+      <div class="step">
+        <div class="math">Δ = (5 − i)² − 4(2 + i)(2 − 2i) = (24 − 10i) − 4(6 − 2i) = −2i</div>
+        <div class="note">(5 − i)² = 25 − 10i − 1; (2 + i)(2 − 2i) = 4 − 4i + 2i + 2 = 6 − 2i</div>
+      </div>
+      <div class="step">
+        <div class="math">√Δ = √<span class="ov">−2i</span> = { 1 − i, &nbsp;−1 + i }</div>
+        <div class="note">to samo co w 4a</div>
+      </div>
+      <div class="step">
+        <div class="math">z<sub>1</sub> = <span class="fr"><span>(5 − i) − (1 − i)</span><span>2(2 + i)</span></span> = <span class="fr"><span>4</span><span>4 + 2i</span></span> = <span class="fr"><span>2</span><span>2 + i</span></span> · <span class="fr"><span>2 − i</span><span>2 − i</span></span> = <span class="fr"><span>4 − 2i</span><span>5</span></span> = <span class="fr"><span>4</span><span>5</span></span> − <span class="fr"><span>2</span><span>5</span></span>i</div>
+        <div class="note">mnożymy przez sprzężenie mianownika: (2 + i)(2 − i) = 4 + 1 = 5</div>
+      </div>
+      <div class="step">
+        <div class="math">z<sub>2</sub> = <span class="fr"><span>(5 − i) + (1 − i)</span><span>2(2 + i)</span></span> = <span class="fr"><span>6 − 2i</span><span>2(2 + i)</span></span> = <span class="fr"><span>3 − i</span><span>2 + i</span></span> = <span class="fr"><span>(3 − i)(2 − i)</span><span>5</span></span> = <span class="fr"><span>6 − 5i + i²</span><span>5</span></span> = <span class="fr"><span>5 − 5i</span><span>5</span></span> = 1 − i</div>
+        <div></div>
+      </div>
+      <div><span class="result math">z<sub>1</sub> = <span class="fr"><span>4</span><span>5</span></span> − <span class="fr"><span>2</span><span>5</span></span>i, &nbsp; z<sub>2</sub> = 1 − i</span></div>
+    </section>
+  </div>
+
+  <!-- ================= DO DOMU ================= -->
+  <div class="group" id="dom">
+    <h2><span class="tag">do domu</span>Przykłady z zestawu, których nie było na tablicy</h2>
+    <div class="note" style="font-size:1.4rem">Najpierw rozwiąż sam, potem rozwiń odpowiedź i sprawdź.</div>
+
+    <div class="hw">
+      <div><div class="label">1a</div><div class="math">(2 + i)(3 + 7i) − (1 + 2i)(5 + 3i)</div>
+        <details><summary>odpowiedź</summary><span class="math">4i</span></details></div>
+      <div><div class="label">1b</div><div class="math">(4 + i)(5 + 3i) + (3 + i)(3 − i)</div>
+        <details><summary>odpowiedź</summary><span class="math">27 + 17i</span></details></div>
+      <div><div class="label">1c</div><div class="math">(1 + 2i)² − (1 − 2i)³</div>
+        <details><summary>odpowiedź</summary><span class="math">8 + 2i</span></details></div>
+      <div><div class="label">1d</div><div class="math"><span class="fr"><span>3 − i</span><span>2 + i</span></span></div>
+        <details><summary>odpowiedź</summary><span class="math">1 − i</span></details></div>
+      <div><div class="label">1e</div><div class="math"><span class="fr"><span>(5 + i)(7 − 6i)</span><span>3 + i</span></span></div>
+        <details><summary>odpowiedź</summary><span class="math">10 − 11i</span></details></div>
+      <div><div class="label">1f</div><div class="math"><span class="fr"><span>(5 + i)(3 + 5i)</span><span>2i</span></span></div>
+        <details><summary>odpowiedź</summary><span class="math">14 − 5i</span></details></div>
+      <div><div class="label">1g</div><div class="math">Re <span class="fr"><span>(1 + 3i)(1 − i)³</span><span>3 + i</span></span></div>
+        <details><summary>odpowiedź</summary><span class="math"><span class="fr"><span>2</span><span>5</span></span> &nbsp;(cały iloraz: <span class="fr"><span>2</span><span>5</span></span> − <span class="fr"><span>14</span><span>5</span></span>i)</span></details></div>
+      <div><div class="label">1h</div><div class="math">Im <span class="fr"><span><span class="ov">5 + i</span></span><span>2i</span></span></div>
+        <details><summary>odpowiedź</summary><span class="math">−<span class="fr"><span>5</span><span>2</span></span></span></details></div>
+      <div><div class="label">2a</div><div class="math">z = −4 &nbsp;→ postać trygonometryczna</div>
+        <details><summary>odpowiedź</summary><span class="math">4 (cos π + i sin π)</span></details></div>
+      <div><div class="label">2b</div><div class="math">z = 2i &nbsp;→ postać trygonometryczna</div>
+        <details><summary>odpowiedź</summary><span class="math">2 (cos <span class="fr"><span>π</span><span>2</span></span> + i sin <span class="fr"><span>π</span><span>2</span></span>)</span></details></div>
+      <div><div class="label">3c</div><div class="math">(1 + √3 i)<sup>15</sup></div>
+        <details><summary>odpowiedź</summary><span class="math">|z| = 2, φ = <span class="fr"><span>π</span><span>3</span></span> → 2<sup>15</sup>(cos 5π + i sin 5π) = −2<sup>15</sup> = −32768</span></details></div>
+      <div><div class="label">4d</div><div class="math"><sup class="ix">4</sup>√<span class="ov">−1</span></div>
+        <details><summary>odpowiedź</summary><span class="math">{ <span class="fr"><span>√2</span><span>2</span></span> + <span class="fr"><span>√2</span><span>2</span></span>i, &nbsp;−<span class="fr"><span>√2</span><span>2</span></span> + <span class="fr"><span>√2</span><span>2</span></span>i, &nbsp;−<span class="fr"><span>√2</span><span>2</span></span> − <span class="fr"><span>√2</span><span>2</span></span>i, &nbsp;<span class="fr"><span>√2</span><span>2</span></span> − <span class="fr"><span>√2</span><span>2</span></span>i }</span></details></div>
+      <div><div class="label">5c</div><div class="math">z² − (3 − 2i)z + 5 − 5i = 0</div>
+        <details><summary>odpowiedź</summary><span class="math">Δ = −15 + 8i, √Δ = ±(1 + 4i) → z<sub>1</sub> = 1 − 3i, z<sub>2</sub> = 2 + i</span></details></div>
+    </div>
+  </div>
+</div>
+
+</html>
