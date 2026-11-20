@@ -113,6 +113,7 @@ button { font:inherit; color:inherit; }
 #view.drag { cursor:grabbing; }
 #stage { position:absolute; left:0; top:0; width:0; height:0; transform-origin:0 0; }  /* will-change is set from script only while moving: a permanent one keeps the layer rastered at zoom 1, so every zoom-in looks blurry */
 #stage.anim { transition:transform .55s cubic-bezier(.2,.8,.2,1); }
+body:not(.list) #stage.far .card > :not(.bar):not(.ty):not(.ti):not(.n) { visibility:hidden; }  /* touch, far zoom: see FAR in the script */
 #view.anim { transition:background-position .55s cubic-bezier(.2,.8,.2,1); }  /* the dots follow the board at a fifth of its speed (parallax) */
 .zone { position:absolute; width:max-content; border:1.5px solid var(--zone-bd); border-radius:38px; padding:28px 28px 32px; }
 .zone::before { content:""; position:absolute; top:0; right:0; bottom:0; left:0; border-radius:inherit; background:var(--zone-bg); z-index:0; }  /* layers: zone bg 0 < links 1 < cards 3 < labels 4 (placed off the cards by placePills) */
@@ -1031,12 +1032,24 @@ const COARSE = matchMedia("(pointer: coarse)").matches;
 // tablet (Galaxy Tab S10 FE+) re-raster everything at the start of each gesture, so cards and the header flickered.
 // Only after the ZOOM changed is the layer re-made once, at rest, so the text is rastered sharp at the new scale.
 const REST = COARSE ? 600 : 180;
+// Zooming OUT: Chrome keeps a will-change layer at its old (higher) raster scale, so the visible part of the board needs
+// (old k / new k)^2 times more tiles. On the tablet that blows the GPU tile budget: tiles are dropped, cards blink or stay
+// empty while panning and come back only after zooming in. So on touch the layer is re-made as soon as the zoom falls to
+// DROP of the scale it was rastered at, even mid-gesture (one repaint, cheap at that zoom), not only at rest.
+// FAR (touch only): below this zoom the card text is unreadable anyway; body, equations and drawings are hidden
+// (visibility, the layout stays) so a far view rasters a handful of boxes and titles instead of every glyph and path.
+const DROP = .6, FAR = .3;
+let relayer = false;
+function remake() {
+  if (relayer) return; relayer = true; stage.style.willChange = "auto";
+  if (COARSE) stage.classList.toggle("far", V.k < FAR);
+  requestAnimationFrame(() => requestAnimationFrame(() => { relayer = false; stage.style.willChange = "transform"; rasterK = V.k; }));
+}
 function apply(anim) {
-  stage.style.willChange = "transform"; clearTimeout(wc);
-  if (V.k !== rasterK) wc = setTimeout(() => {
-    stage.style.willChange = "auto";
-    requestAnimationFrame(() => requestAnimationFrame(() => { stage.style.willChange = "transform"; rasterK = V.k; }));
-  }, anim ? Math.max(700, REST) : REST);
+  if (!relayer) stage.style.willChange = "transform"; clearTimeout(wc);
+  const far = stage.classList.contains("far");
+  if (COARSE && !anim && (V.k < rasterK * DROP || (far && V.k > FAR * 1.15))) remake();
+  if (V.k !== rasterK) wc = setTimeout(() => { if (V.k !== rasterK || stage.classList.contains("far") !== (COARSE && V.k < FAR)) remake(); }, anim ? Math.max(700, REST) : REST);
   stage.classList.toggle("anim", !!anim); view.classList.toggle("anim", !!anim);
   stage.style.transform = `translate(${V.x}px,${V.y}px) scale(${V.k})`;
   view.style.backgroundPosition = `${(V.x * .2).toFixed(1)}px ${(V.y * .2).toFixed(1)}px`;  // minimal parallax
